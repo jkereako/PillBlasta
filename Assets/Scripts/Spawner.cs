@@ -6,7 +6,8 @@ public class Spawner: MonoBehaviour {
 
   Wave currentWave;
   int waveIndex;
-  int enemiesRemaining;
+  int spawnCount;
+  int activeCount;
   float nextSpawnTime;
 
   void Start() {
@@ -14,19 +15,34 @@ public class Spawner: MonoBehaviour {
   }
 
   void Update() {
-    if (enemiesRemaining > 0 && Time.time > nextSpawnTime) {
-      enemiesRemaining -= 1;
+    if (spawnCount > 0 && Time.time > nextSpawnTime) {
+      spawnCount -= 1;
       nextSpawnTime = Time.time + currentWave.waitValue;
 
       Enemy spawn = Instantiate(enemy, Vector3.zero, Quaternion.identity) as Enemy;
+      // Assign the delegate `OnEnemyDeath`
+      spawn.OnDeath += OnEnemyDeath;
+    }
+  }
+
+  void OnEnemyDeath() {
+    activeCount -= 1;
+
+    if (activeCount == 0) {
+      NextWave();
     }
   }
 
   void NextWave() {
-    waveIndex += 1;
-    currentWave = waves[waveIndex - 1];
+    Debug.Log("Wave: " + waveIndex);
 
-    enemiesRemaining = currentWave.enemyCount;
+    if (waveIndex > waves.Length) {
+      return;
+    }
+
+    currentWave = waves[waveIndex];
+    activeCount = spawnCount = currentWave.enemyCount;
+    waveIndex += 1;
   }
 
   [System.Serializable]
