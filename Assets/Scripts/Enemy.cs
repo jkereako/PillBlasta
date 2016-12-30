@@ -16,27 +16,39 @@ public class Enemy: LiveEntity {
   Material material;
   Color originalColor;
   Transform target;
-  float attackDistanceThreshold = 0.5f;
-  float attackWaitValue = 1.0f;
+  LiveEntity targetEntity;
+  const float attackDistanceThreshold = 0.5f;
+  const float attackWaitValue = 1.0f;
+  const float attackDamage = 1.0f;
   float nextAttackTime;
   float collisionRadius;
   float targetCollisionRadius;
+  bool hasTarget;
 
   protected override void Start() {
     base.Start();
+
+    if (GameObject.FindGameObjectWithTag("Player") == null) {
+      hasTarget = false;
+      return;
+    }
+
+    hasTarget = true;
     nextAttackTime = Time.time;
     state = State.Chasing;
+    target = GameObject.FindGameObjectWithTag("Player").transform;
     pathFinder = GetComponent<NavMeshAgent>();
     material = GetComponent<Renderer>().material;
+    targetEntity = target.GetComponent<LiveEntity>();
+    targetEntity.OnDeath += OnTargetDeath;
     originalColor = material.color;
-    target = GameObject.FindGameObjectWithTag("Player").transform;
     collisionRadius = GetComponent<CapsuleCollider>().radius;
     targetCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
     StartCoroutine(UpdatePath());
   }
 
   void Update() {
-    if (Time.time < nextAttackTime) {
+    if (!hasTarget || Time.time < nextAttackTime) {
       return;
     }
 
@@ -46,6 +58,11 @@ public class Enemy: LiveEntity {
       nextAttackTime = Time.time + attackWaitValue;
       StartCoroutine(Attack());
     }
+  }
+
+  void OnTargetDeath() {
+    hasTarget = false;
+    state = State.Idle;
   }
 
   IEnumerator Attack() {
@@ -59,8 +76,14 @@ public class Enemy: LiveEntity {
     float attackSpeed = 3.0f;
     float percentCompleted = 0.0f;
     material.color = Color.red;
+    bool hasAppliedDamage = false;
 
     while (percentCompleted <= 1) {
+      if (percentCompleted > 0.5f && !hasAppliedDamage) {
+        hasAppliedDamage = true;
+        targetEntity.TakeDamage(attackDamage);
+      }
+
       percentCompleted += Time.deltaTime * attackSpeed;
       // `interpolation` is a point on a porabola. Since the enemy will lunge forward and then 
       // receed, we need to increase a value gradually from zero and then decrease it back to zero.
@@ -79,7 +102,7 @@ public class Enemy: LiveEntity {
   IEnumerator UpdatePath() {
     const float refreshRate = 0.25f;
 
-    while (target != null) {
+    while (hasTarget) {
       if (state == State.Chasing) {
         Vector3 directionToTarget = (target.position - transform.position).normalized;
         Vector3 targetPosition = target.position - directionToTarget *
