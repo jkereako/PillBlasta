@@ -3,20 +3,17 @@ using UnityEngine.AI;
 using System.Collections;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Enemy: MonoBehaviour {
+public class Enemy: LiveEntity {
 
   NavMeshAgent pathFinder;
   Transform target;
 
-  void Start() {
+  public override void Start() {
+    base.Start();
     pathFinder = GetComponent<NavMeshAgent>();
     target = GameObject.FindGameObjectWithTag("Player").transform;
 
     StartCoroutine(UpdatePath());
-  }
-
-  void Update() {
-//    pathFinder.SetDestination(target.position);
   }
 
   IEnumerator UpdatePath() {

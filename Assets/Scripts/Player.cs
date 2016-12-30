@@ -3,14 +3,15 @@
 // Declare the file's dependencies
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(WeaponController))]
-public class Player: MonoBehaviour {
+public class Player: LiveEntity {
   public float speed = 5;
 
   PlayerController playerController;
   WeaponController weaponController;
   Camera mainCamera;
 
-  void Start() {
+  public override void Start() {
+    base.Start();
     playerController = GetComponent<PlayerController>();
     weaponController = GetComponent<WeaponController>();
     mainCamera = Camera.main;

@@ -15,6 +15,6 @@ public class Weapon: MonoBehaviour {
 
     nextShotTime = Time.time + fireRate / 1000;
     Projectile aProjectile = Instantiate(projectile, muzzle.position, muzzle.rotation) as Projectile;
-    aProjectile.speed = muzzleVelocity;
+    aProjectile.SetSpeed(muzzleVelocity);
   }
 }
