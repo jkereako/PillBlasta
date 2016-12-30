@@ -4,7 +4,12 @@ public class Projectile: MonoBehaviour {
   public LayerMask collisionMask;
 
   float speed;
-  float damage = 1;
+  const float damage = 1.0f;
+  const float lifeTime = 2.0f;
+
+  void Start() {
+    Destroy(gameObject, lifeTime);
+  }
 
   void Update() {
     float distance = Time.deltaTime * speed;
