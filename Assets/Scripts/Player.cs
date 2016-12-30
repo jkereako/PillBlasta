@@ -10,7 +10,7 @@ public class Player: LiveEntity {
   WeaponController weaponController;
   Camera mainCamera;
 
-  public override void Start() {
+  protected override void Start() {
     base.Start();
     playerController = GetComponent<PlayerController>();
     weaponController = GetComponent<WeaponController>();

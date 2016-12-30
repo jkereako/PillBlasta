@@ -8,7 +8,7 @@ public class Enemy: LiveEntity {
   NavMeshAgent pathFinder;
   Transform target;
 
-  public override void Start() {
+  protected override void Start() {
     base.Start();
     pathFinder = GetComponent<NavMeshAgent>();
     target = GameObject.FindGameObjectWithTag("Player").transform;
@@ -21,8 +21,11 @@ public class Enemy: LiveEntity {
 
     while (target != null) {
       Vector3 targetPosition = new Vector3(target.position.x, 0, target.position.z);
-      pathFinder.SetDestination(targetPosition);
 
+      if (isAlive) {
+        pathFinder.SetDestination(targetPosition); 
+      }
+        
       yield return new WaitForSeconds(refreshRate);
     }
   }
