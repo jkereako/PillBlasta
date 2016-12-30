@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 
 public class Weapon: MonoBehaviour {
+  public Transform muzzle;
+  public Projectile projectile;
+  public float fireRate = 100;
+  public float muzzleVelocity = 35;
 
-  // Use this for initialization
-  void Start() {
-		
-  }
-	
-  // Update is called once per frame
-  void Update() {
-		
+  float nextShotTime;
+
+  public void Fire() {
+    if (Time.time < nextShotTime) {
+      return;
+    }
+
+    nextShotTime = Time.time + fireRate / 1000;
+    Projectile aProjectile = Instantiate(projectile, muzzle.position, muzzle.rotation) as Projectile;
+    aProjectile.speed = muzzleVelocity;
   }
 }

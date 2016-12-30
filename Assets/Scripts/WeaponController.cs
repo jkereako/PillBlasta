@@ -14,6 +14,12 @@ public class WeaponController: MonoBehaviour {
     }
   }
 
+  public void FireWeapon() {
+    if (weapon != null) {
+      weapon.Fire();
+    }
+  }
+
   public void EquipWeapon(Weapon aWeapon) {
     if (weapon != null) {
       // Mark the current weapon for destruction
