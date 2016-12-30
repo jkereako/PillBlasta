@@ -1,16 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class Enemy: MonoBehaviour {
 
-  // Use this for initialization
+  NavMeshAgent pathFinder;
+  Transform target;
+
   void Start() {
-		
+    pathFinder = GetComponent<NavMeshAgent>();
+    target = GameObject.FindGameObjectWithTag("Player").transform;
+
+    StartCoroutine(UpdatePath());
   }
-	
-  // Update is called once per frame
+
   void Update() {
-		
+//    pathFinder.SetDestination(target.position);
+  }
+
+  IEnumerator UpdatePath() {
+    const float refreshRate = 0.25f;
+
+    while (target != null) {
+      Vector3 targetPosition = new Vector3(target.position.x, 0, target.position.z);
+      pathFinder.SetDestination(targetPosition);
+
+      yield return new WaitForSeconds(refreshRate);
+    }
   }
 }

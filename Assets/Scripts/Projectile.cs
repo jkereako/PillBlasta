@@ -1,10 +1,25 @@
 ﻿using UnityEngine;
 
 public class Projectile: MonoBehaviour {
+  public LayerMask collisionMask;
   public float speed;
 
-  // Update is called once per frame
   void Update() {
-    transform.Translate(Vector3.forward * Time.deltaTime * speed);
+    float distance = Time.deltaTime * speed;
+    CheckCollision(distance);
+    transform.Translate(Vector3.forward * distance);
+  }
+
+  void CheckCollision(float distance) {
+    Ray ray = new Ray(transform.position, transform.forward);
+    RaycastHit hit;
+
+    if (Physics.Raycast(ray, out hit, distance, collisionMask, QueryTriggerInteraction.Collide)) {
+      OnObjectHit(hit);
+    }
+  }
+
+  void OnObjectHit(RaycastHit hit) {
+    GameObject.Destroy(gameObject);
   }
 }

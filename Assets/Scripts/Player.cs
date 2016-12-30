@@ -8,12 +8,12 @@ public class Player: MonoBehaviour {
 
   PlayerController playerController;
   WeaponController weaponController;
-  Camera camera;
+  Camera mainCamera;
 
   void Start() {
     playerController = GetComponent<PlayerController>();
     weaponController = GetComponent<WeaponController>();
-    camera = Camera.main;
+    mainCamera = Camera.main;
   }
 
   void Update() {
@@ -23,7 +23,7 @@ public class Player: MonoBehaviour {
     playerController.Move(velocity);
 
     // The code below allows the player's "eyes" to follow the mouse movement.
-    Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+    Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
     // Emulate the playing surface by creating a new, flat plane. This simplifies the code as we
     // don't have to depend on the actual in-game plane.
     Plane plane = new Plane(Vector3.up, Vector3.zero);
