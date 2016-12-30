@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using System;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class Enemy: LiveEntity {
@@ -14,18 +13,25 @@ public class Enemy: LiveEntity {
 
   State state;
   NavMeshAgent pathFinder;
+  Material material;
+  Color originalColor;
   Transform target;
-  float attackDistanceThreshold = 1.5f;
+  float attackDistanceThreshold = 0.5f;
   float attackWaitValue = 1.0f;
   float nextAttackTime;
+  float collisionRadius;
+  float targetCollisionRadius;
 
   protected override void Start() {
     base.Start();
     nextAttackTime = Time.time;
     state = State.Chasing;
     pathFinder = GetComponent<NavMeshAgent>();
+    material = GetComponent<Renderer>().material;
+    originalColor = material.color;
     target = GameObject.FindGameObjectWithTag("Player").transform;
-
+    collisionRadius = GetComponent<CapsuleCollider>().radius;
+    targetCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
     StartCoroutine(UpdatePath());
   }
 
@@ -35,8 +41,8 @@ public class Enemy: LiveEntity {
     }
 
     float squareDistanceToTarget = (target.position - transform.position).sqrMagnitude;
-
-    if (squareDistanceToTarget < Mathf.Pow(attackDistanceThreshold, 2)) {
+    float dist = attackDistanceThreshold + collisionRadius + targetCollisionRadius;
+    if (squareDistanceToTarget < Mathf.Pow(dist, 2)) {
       nextAttackTime = Time.time + attackWaitValue;
       StartCoroutine(Attack());
     }
@@ -47,9 +53,12 @@ public class Enemy: LiveEntity {
     pathFinder.enabled = false;
 
     Vector3 originalPosition = transform.position;
-    Vector3 attackPosition = target.position;
+    Vector3 directionToTarget = (target.position - transform.position).normalized;
+    Vector3 attackPosition = target.position - directionToTarget * collisionRadius;
+    
     float attackSpeed = 3.0f;
     float percentCompleted = 0.0f;
+    material.color = Color.red;
 
     while (percentCompleted <= 1) {
       percentCompleted += Time.deltaTime * attackSpeed;
@@ -62,6 +71,7 @@ public class Enemy: LiveEntity {
       yield return null;
     }
 
+    material.color = originalColor;
     state = State.Chasing;
     pathFinder.enabled = true;
   }
@@ -71,7 +81,9 @@ public class Enemy: LiveEntity {
 
     while (target != null) {
       if (state == State.Chasing) {
-        Vector3 targetPosition = new Vector3(target.position.x, 0, target.position.z);
+        Vector3 directionToTarget = (target.position - transform.position).normalized;
+        Vector3 targetPosition = target.position - directionToTarget *
+                                 (collisionRadius + targetCollisionRadius + attackDistanceThreshold / 2);
 
         if (isAlive) {
           pathFinder.SetDestination(targetPosition); 
