@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.WSA;
 
 public class MapGenerator: MonoBehaviour {
   public Transform tilePrefab;
   public Transform obstaclePrefab;
+  public Transform navMeshFloor;
+  public Transform navMeshMask;
+  public Vector2 maxMapSize;
   public Vector2 mapSize;
   public float tileSize;
   [Range(0, 1)]
@@ -91,6 +95,8 @@ public class MapGenerator: MonoBehaviour {
       obstacle.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
       obstacle.parent = containerObject;
     }
+
+    navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
 
   // This is an implementation of the Flood-fill 4 algorithm.
