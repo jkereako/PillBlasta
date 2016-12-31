@@ -5,14 +5,16 @@ public class MapGenerator: MonoBehaviour {
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Vector2 mapSize;
+  public float tileSize;
   [Range(0, 1)]
   public float outLinePercent;
   [Range(0, 1)]
   public float obstaclePercent;
+  public int seed = 10;
+
   List<Coordinate> tileCoordinates;
   Queue<Coordinate> shuffledTileCoordinates;
   Coordinate mapCenter;
-  public int seed = 10;
 
   public struct Coordinate {
     public int x;
@@ -63,7 +65,7 @@ public class MapGenerator: MonoBehaviour {
       for (int y = 0; y < mapSize.y; y++) {
         Vector3 tilePosition = CoordinateToPosition(x, y);
         Transform tile = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
-        tile.localScale = Vector3.one * (1 - outLinePercent);
+        tile.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
         // Associate the tiles with the generated map.
         tile.parent = containerObject;
       }
@@ -86,6 +88,7 @@ public class MapGenerator: MonoBehaviour {
 
       Vector3 obstaclePosition = CoordinateToPosition(coordinate.x, coordinate.y);
       Transform obstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * 0.5f, Quaternion.identity);
+      obstacle.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
       obstacle.parent = containerObject;
     }
   }
@@ -128,7 +131,7 @@ public class MapGenerator: MonoBehaviour {
   }
 
   Vector3 CoordinateToPosition(int x, int y) {
-    return new Vector3(-mapSize.x / 2 + 0.5f + x, 0, -mapSize.y / 2 + 0.5f + y);
+    return new Vector3(-mapSize.x / 2 + 0.5f + x, 0, -mapSize.y / 2 + 0.5f + y) * tileSize;
   }
 
   Coordinate GetRandomCoordinate() {
