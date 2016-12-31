@@ -6,7 +6,7 @@ public class MapGenerator: MonoBehaviour {
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
-  public Transform navMeshMask;
+  public Transform navMeshMaskPrefab;
   public Vector2 maxMapSize;
   public Vector2 mapSize;
   public float tileSize;
@@ -95,6 +95,34 @@ public class MapGenerator: MonoBehaviour {
       obstacle.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
       obstacle.parent = containerObject;
     }
+
+    Transform navMeshMaskLeft = Instantiate(
+                                  navMeshMaskPrefab, 
+                                  Vector3.left * (mapSize.x + maxMapSize.x) / 4 * tileSize, 
+                                  Quaternion.identity) as Transform;
+    navMeshMaskLeft.localScale = new Vector3((mapSize.x - maxMapSize.x) / 2, 1, mapSize.y) * tileSize;
+    navMeshMaskLeft.parent = containerObject;
+
+    Transform navMeshMaskRight = Instantiate(
+                                   navMeshMaskPrefab, 
+                                   Vector3.right * (mapSize.x + maxMapSize.x) / 4 * tileSize, 
+                                   Quaternion.identity) as Transform;
+    navMeshMaskRight.localScale = new Vector3((mapSize.x - maxMapSize.x) / 2, 1, mapSize.y) * tileSize;
+    navMeshMaskRight.parent = containerObject;
+
+    Transform navMeshMaskTop = Instantiate(
+                                 navMeshMaskPrefab, 
+                                 Vector3.forward * (mapSize.x + maxMapSize.x) / 4 * tileSize, 
+                                 Quaternion.identity) as Transform;
+    navMeshMaskTop.localScale = new Vector3(maxMapSize.x, 1, (maxMapSize.y - mapSize.y) / 2) * tileSize;
+    navMeshMaskTop.parent = containerObject;
+
+    Transform navMeshMaskBottom = Instantiate(
+                                    navMeshMaskPrefab, 
+                                    Vector3.back * (mapSize.x + maxMapSize.x) / 4 * tileSize, 
+                                    Quaternion.identity) as Transform;
+    navMeshMaskBottom.localScale = new Vector3(maxMapSize.x, 1, (maxMapSize.y - mapSize.y) / 2) * tileSize;
+    navMeshMaskBottom.parent = containerObject;
 
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
