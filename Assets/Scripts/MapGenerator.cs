@@ -96,6 +96,10 @@ public class MapGenerator: MonoBehaviour {
       obstacle.parent = containerObject;
     }
 
+    // The seemingly redundant code below masks the large nav mesh object so that the enemies cannot
+    // walk outside of the map.
+    // https://youtu.be/vQgLdFNrCN8?t=405
+
     Transform navMeshMaskLeft = Instantiate(
                                   navMeshMaskPrefab, 
                                   Vector3.left * (mapSize.x + maxMapSize.x) / 4 * tileSize, 
