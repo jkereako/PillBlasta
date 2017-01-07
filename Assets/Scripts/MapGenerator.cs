@@ -1,49 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.WSA;
 
 public class MapGenerator: MonoBehaviour {
+  public Map[] maps;
+  public int mapIndex;
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
   public Transform navMeshMaskPrefab;
   public Vector2 maxMapSize;
-  public Vector2 mapSize;
   public float tileSize;
   [Range(0, 1)]
   public float outLinePercent;
-  [Range(0, 1)]
-  public float obstaclePercent;
-  public int seed = 10;
 
+  Map currentMap;
   List<Coordinate> tileCoordinates;
   Queue<Coordinate> shuffledTileCoordinates;
-  Coordinate mapCenter;
-
-  public struct Coordinate {
-    public int x;
-    public int y;
-
-    public Coordinate(int xCoordinate, int yCoordinate) {
-      x = xCoordinate;
-      y = yCoordinate;
-    }
-
-    public static bool operator ==(Coordinate c1, Coordinate  c2) {
-      return c1.x == c2.x && c1.y == c2.y;
-    }
-
-    public static bool operator !=(Coordinate c1, Coordinate  c2) {
-      return c1.x != c2.x || c1.y != c2.y;
-    }
-  }
 
   void Start() {
     GenerateMap();
   }
 
   public void GenerateMap() {
+    currentMap = maps[mapIndex];
     const string containerName = "GeneratedMap";
+    Coordinate mapCenter = currentMap.center;
+    Coordinate mapSize = currentMap.size;
 
     tileCoordinates = new List<Coordinate>();
     for (int x = 0; x < mapSize.x; x++) {
@@ -52,8 +34,7 @@ public class MapGenerator: MonoBehaviour {
       }
     }
 
-    mapCenter = new Coordinate((int)mapSize.x / 2, (int)mapSize.y / 2);
-    shuffledTileCoordinates = new Queue<Coordinate>(Utility.Shuffle(tileCoordinates.ToArray(), seed));
+    shuffledTileCoordinates = new Queue<Coordinate>(Utility.Shuffle(tileCoordinates.ToArray(), currentMap.seed));
 
     // First, immediately destroy the container object if it already exists.
     if (transform.FindChild(containerName)) {
@@ -76,7 +57,7 @@ public class MapGenerator: MonoBehaviour {
     }
 
     bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
-    int obstacleCount = (int)(mapSize.x * mapSize.y * obstaclePercent);
+    int obstacleCount = (int)(mapSize.x * mapSize.y * currentMap.obstaclePercent);
     int currentObstacleCount = 0;
     // Generate the obstalces
     for (int i = 0; i < obstacleCount; i++) {
@@ -84,7 +65,7 @@ public class MapGenerator: MonoBehaviour {
       obstacleMap[coordinate.x, coordinate.y] = true;
       currentObstacleCount += 1;
 
-      if (coordinate == mapCenter || !IsMapCompletelyAccessible(obstacleMap, i)) {
+      if (coordinate == mapCenter || !currentMap.IsMapCompletelyAccessible(obstacleMap, i)) {
         currentObstacleCount -= 1;
         obstacleMap[coordinate.x, coordinate.y] = false;
         continue;
@@ -131,45 +112,8 @@ public class MapGenerator: MonoBehaviour {
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
 
-  // This is an implementation of the Flood-fill 4 algorithm.
-  bool IsMapCompletelyAccessible(bool[,] obstacleMap, int obstacleCount) {
-    bool[,] mapFlags = new bool[obstacleMap.GetLength(0), obstacleMap.GetLength(1)];
-    Queue<Coordinate> queue = new Queue<Coordinate>();
-
-    queue.Enqueue(mapCenter);
-    mapFlags[mapCenter.x, mapCenter.y] = true;
-    int accessibleTileCount = 0;
-
-    while (queue.Count > 0) {
-      Coordinate tile = queue.Dequeue();
-
-      for (int x = -1; x < 2; x++) {
-        for (int y = -1; y < 2; y++) {
-          int neighborX = tile.x + x;
-          int neighborY = tile.y + y;
-
-          if (x == 0 || y == 0) {
-            if (neighborX >= 0 && neighborX < obstacleMap.GetLength(0) &&
-                neighborY >= 0 && neighborY < obstacleMap.GetLength(1)) {
-
-              if (!mapFlags[neighborX, neighborY] && !obstacleMap[neighborX, neighborY]) {
-                mapFlags[neighborX, neighborY] = true;
-                queue.Enqueue(new Coordinate(neighborX, neighborY));
-                accessibleTileCount += 1;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    int expectedAccessibleTileCount = (int)(mapSize.x * mapSize.y - obstacleCount);
-
-    return expectedAccessibleTileCount == accessibleTileCount;
-  }
-
   Vector3 CoordinateToPosition(int x, int y) {
-    return new Vector3(-mapSize.x / 2 + 0.5f + x, 0, -mapSize.y / 2 + 0.5f + y) * tileSize;
+    return new Vector3(-currentMap.size.x / 2 + 0.5f + x, 0, -currentMap.size.y / 2 + 0.5f + y) * tileSize;
   }
 
   Coordinate GetRandomCoordinate() {
