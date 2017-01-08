@@ -41,14 +41,7 @@ public class Spawner: MonoBehaviour {
     }
 
     currentWave = waves[waveIndex];
-    activeCount = spawnCount = currentWave.enemyCount;
+    activeCount = spawnCount = currentWave.entityCount;
     waveIndex += 1;
   }
-
-  [System.Serializable]
-  public class Wave {
-    public int enemyCount;
-    public float waitValue;
-  }
-
 }

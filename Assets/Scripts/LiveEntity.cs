@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LiveEntity : MonoBehaviour, IDamageable {
+public class LiveEntity: MonoBehaviour, IDamageable {
   public float initialHealth;
   protected float health;
   protected bool isAlive;
