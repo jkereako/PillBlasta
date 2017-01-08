@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class Map {
   public Coordinate size;
   public Vector2 maxSize;
-  [Range(0, 1)]
   public int seed;
   public float tileSeparatorWidth;
   public float tileSize;

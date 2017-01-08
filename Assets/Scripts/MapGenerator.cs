@@ -80,13 +80,7 @@ public class MapGenerator: MonoBehaviour {
 
     // Generate the obstalces
     for (int i = 0; i < limit; i++) {
-      Vector3 position;
-      Transform obstacle;
-      Renderer obstacleRenderer;
-      Material obstacleMaterial;
       Coordinate coordinate = GetRandomCoordinate();
-      float height = 0.0f;
-      float colorPercent = 0.0f;
       obstacleMap[coordinate.x, coordinate.y] = true;
       count += 1;
 
@@ -95,6 +89,13 @@ public class MapGenerator: MonoBehaviour {
         obstacleMap[coordinate.x, coordinate.y] = false;
         continue;
       }
+
+      Vector3 position;
+      Transform obstacle;
+      Renderer obstacleRenderer;
+      Material obstacleMaterial;
+      float height = 0.0f;
+      float colorPercent = 0.0f;
 
       height = Mathf.Lerp(
         map.obstacleData.minHeight, map.obstacleData.maxHeight, (float)random.NextDouble()
