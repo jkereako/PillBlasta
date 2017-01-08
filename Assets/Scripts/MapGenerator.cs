@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(BoxCollider))]
 public class MapGenerator: MonoBehaviour {
   public Map[] maps;
   public int mapIndex;
@@ -8,11 +9,11 @@ public class MapGenerator: MonoBehaviour {
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
   public Transform navMeshMaskPrefab;
-  public Vector2 maxMapSize;
-  public float tileSize;
+ 
   [Range(0, 1)]
   public float outLinePercent;
 
+  const string containerName = "GeneratedMap";
   Map currentMap;
   List<Coordinate> tileCoordinates;
   Queue<Coordinate> shuffledTileCoordinates;
@@ -23,11 +24,15 @@ public class MapGenerator: MonoBehaviour {
 
   public void GenerateMap() {
     currentMap = maps[mapIndex];
-    const string containerName = "GeneratedMap";
+
     Coordinate mapCenter = currentMap.center;
     Coordinate mapSize = currentMap.size;
+    float tileSize = currentMap.tileSize;
+    Vector2 maxMapSize = currentMap.maxSize;
     System.Random random = new System.Random(currentMap.seed);
-
+    GetComponent<BoxCollider>().size = new Vector3(
+      currentMap.size.x * tileSize, 0.5f, currentMap.size.y * tileSize
+    );
     tileCoordinates = new List<Coordinate>();
     for (int x = 0; x < mapSize.x; x++) {
       for (int y = 0; y < mapSize.y; y++) {
@@ -49,7 +54,7 @@ public class MapGenerator: MonoBehaviour {
     // Generate the tiles
     for (int x = 0; x < mapSize.x; x++) {
       for (int y = 0; y < mapSize.y; y++) {
-        Vector3 tilePosition = CoordinateToPosition(x, y);
+        Vector3 tilePosition = currentMap.CoordinateToPosition(new Coordinate(x, y));
         Transform tile = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
         // Associate the tiles with the generated map.
@@ -81,7 +86,7 @@ public class MapGenerator: MonoBehaviour {
         currentMap.obstacleData.maxHeight,
         (float)random.NextDouble()
       );
-      Vector3 obstaclePosition = CoordinateToPosition(coordinate.x, coordinate.y);
+      Vector3 obstaclePosition = currentMap.CoordinateToPosition(coordinate);
       Transform obstacle = Instantiate(
                              obstaclePrefab, 
                              obstaclePosition + Vector3.up * obstacleHeight / 2.0f, 
@@ -135,10 +140,6 @@ public class MapGenerator: MonoBehaviour {
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
 
-  Vector3 CoordinateToPosition(int x, int y) {
-    return new Vector3(-currentMap.size.x / 2.0f + 0.5f + x, 0, -currentMap.size.y / 2.0f + 0.5f + y) * tileSize;
-  }
-
   Coordinate GetRandomCoordinate() {
     // This cleaver trick ensures we never run out of coordinates.
     Coordinate coordinate = shuffledTileCoordinates.Dequeue();
@@ -146,5 +147,4 @@ public class MapGenerator: MonoBehaviour {
 
     return coordinate;
   }
-
 }

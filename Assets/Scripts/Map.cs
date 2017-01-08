@@ -4,10 +4,12 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Map {
   public Coordinate size;
+  public Vector2 maxSize;
   [Range(0, 1)]
-  public float obstaclePercent;
   public int seed;
+  public float tileSize;
   public Obstacle obstacleData;
+  public float obstaclePercent;
 
   public Coordinate center {
     get {
@@ -50,5 +52,9 @@ public class Map {
     int expectedAccessibleTileCount = (int)(size.x * size.y - obstacleCount);
 
     return expectedAccessibleTileCount == accessibleTileCount;
+  }
+
+  public Vector3 CoordinateToPosition(Coordinate coordinate) {
+    return new Vector3(-size.x / 2.0f + 0.5f + coordinate.x, 0, -size.y / 2.0f + 0.5f + coordinate.y) * tileSize;
   }
 }
