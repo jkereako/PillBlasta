@@ -93,37 +93,7 @@ public class MapGenerator: MonoBehaviour {
       obstacle.parent = containerObject;
     }
 
-    // The seemingly redundant code below masks the large nav mesh object so that the enemies cannot
-    // walk outside of the map.
-    // https://youtu.be/vQgLdFNrCN8?t=405
-
-    Transform navMeshMaskLeft = Instantiate(
-                                  navMeshMaskPrefab, 
-                                  Vector3.left * (mapSize.x + maxMapSize.x) / 4.0f * tileSize, 
-                                  Quaternion.identity) as Transform;
-    navMeshMaskLeft.localScale = new Vector3((mapSize.x - maxMapSize.x) / 2.0f, 1, mapSize.y) * tileSize;
-    navMeshMaskLeft.parent = containerObject;
-
-    Transform navMeshMaskRight = Instantiate(
-                                   navMeshMaskPrefab, 
-                                   Vector3.right * (mapSize.x + maxMapSize.x) / 4.0f * tileSize, 
-                                   Quaternion.identity) as Transform;
-    navMeshMaskRight.localScale = new Vector3((mapSize.x - maxMapSize.x) / 2.0f, 1, mapSize.y) * tileSize;
-    navMeshMaskRight.parent = containerObject;
-
-    Transform navMeshMaskTop = Instantiate(
-                                 navMeshMaskPrefab, 
-                                 Vector3.forward * (mapSize.x + maxMapSize.x) / 4.0f * tileSize, 
-                                 Quaternion.identity) as Transform;
-    navMeshMaskTop.localScale = new Vector3(maxMapSize.x, 1, (maxMapSize.y - mapSize.y) / 2.0f) * tileSize;
-    navMeshMaskTop.parent = containerObject;
-
-    Transform navMeshMaskBottom = Instantiate(
-                                    navMeshMaskPrefab, 
-                                    Vector3.back * (mapSize.x + maxMapSize.x) / 4.0f * tileSize, 
-                                    Quaternion.identity) as Transform;
-    navMeshMaskBottom.localScale = new Vector3(maxMapSize.x, 1, (maxMapSize.y - mapSize.y) / 2.0f) * tileSize;
-    navMeshMaskBottom.parent = containerObject;
+    CreateMapMask(currentMap, navMeshMaskPrefab, containerObject);
 
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
@@ -141,6 +111,45 @@ public class MapGenerator: MonoBehaviour {
         tile.parent = containerObject;
       }
     }
+  }
+
+  void CreateMapMask(Map map, Transform maskPrefab, Transform containerObject) {
+    // The seemingly redundant code below masks the large nav mesh object so that the enemies cannot
+    // walk outside of the map.
+    // https://youtu.be/vQgLdFNrCN8?t=405
+    Transform maskLeft, maskRight, maskTop, maskBottom;
+
+    maskLeft = Instantiate(
+      maskPrefab, 
+      Vector3.left * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
+      Quaternion.identity) as Transform;
+    maskLeft.localScale = new Vector3(
+      (map.size.x - map.maxSize.x) / 2.0f, 1, map.size.y) * map.tileSize;
+    maskLeft.parent = containerObject;
+
+    maskRight = Instantiate(
+      maskPrefab, 
+      Vector3.right * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
+      Quaternion.identity) as Transform;
+    maskRight.localScale = new Vector3(
+      (map.size.x - map.maxSize.x) / 2.0f, 1, map.size.y) * map.tileSize;
+    maskRight.parent = containerObject;
+
+    maskTop = Instantiate(
+      maskPrefab, 
+      Vector3.forward * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
+      Quaternion.identity) as Transform;
+    maskTop.localScale = new Vector3(
+      map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
+    maskTop.parent = containerObject;
+
+    maskBottom = Instantiate(
+      maskPrefab, 
+      Vector3.back * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
+      Quaternion.identity) as Transform;
+    maskBottom.localScale = new Vector3(
+      map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
+    maskBottom.parent = containerObject;
   }
 
   Coordinate GetRandomCoordinate() {
