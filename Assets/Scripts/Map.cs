@@ -7,10 +7,7 @@ public class Map {
   [Range(0, 1)]
   public float obstaclePercent;
   public int seed;
-  public float minObstacleHeight;
-  public float maxObstacleHeight;
-  public Color foregroundColor;
-  public Color backgroundColor;
+  public Obstacle obstacleData;
 
   public Coordinate center {
     get {
