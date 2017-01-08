@@ -33,12 +33,13 @@ public class Map {
 
       for (int x = -1; x < 2; x++) {
         for (int y = -1; y < 2; y++) {
-          // This line is what makes this a Flood-fill 4. That is, we ignore the diagonal neighbors.
+          // This condition makes this a Flood-fill 4 algorithm. That is, we ignore the diagonal 
+          // neighbors.
           if (x != 0 && y != 0) {
             continue;
           }
 
-          Coordinate neighbor = Coordinate(tile.x + x, tile.y + y);
+          Coordinate neighbor = new Coordinate(tile.x + x, tile.y + y);
 
           if (neighbor.x >= 0 && neighbor.x < obstacleMap.GetLength(0) &&
               neighbor.y >= 0 && neighbor.y < obstacleMap.GetLength(1)) {
