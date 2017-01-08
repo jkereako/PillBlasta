@@ -132,37 +132,34 @@ public class MapGenerator: MonoBehaviour {
     // https://youtu.be/vQgLdFNrCN8?t=405
     Transform maskLeft, maskRight, maskTop, maskBottom;
 
-    maskLeft = Instantiate(
-      maskPrefab, 
-      Vector3.left * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
-      Quaternion.identity) as Transform;
-    maskLeft.localScale = new Vector3(
-      (map.size.x - map.maxSize.x) / 2.0f, 1, map.size.y) * map.tileSize;
+    Func<Vector3, Transform> createMask = (Vector3 v) => { 
+      return Instantiate(
+        maskPrefab, v * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, Quaternion.identity
+      ) as Transform;
+    };
+
+    Func<Vector3> xScale = () => { 
+      return new Vector3((map.size.x - map.maxSize.x) / 2.0f, 1, map.size.y) * map.tileSize;
+    };
+
+    Func<Vector3> yScale = () => { 
+      return new Vector3(map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
+    };
+
+    maskLeft = createMask(Vector3.left);
+    maskLeft.localScale = xScale();
     maskLeft.parent = containerObject;
 
-    maskRight = Instantiate(
-      maskPrefab, 
-      Vector3.right * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
-      Quaternion.identity) as Transform;
-    maskRight.localScale = new Vector3(
-      (map.size.x - map.maxSize.x) / 2.0f, 1, map.size.y) * map.tileSize;
+    maskRight = createMask(Vector3.right);
+    maskRight.localScale = xScale();
     maskRight.parent = containerObject;
 
-    maskTop = Instantiate(
-      maskPrefab, 
-      Vector3.forward * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
-      Quaternion.identity) as Transform;
-    maskTop.localScale = new Vector3(
-      map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
+    maskTop = createMask(Vector3.forward);
+    maskTop.localScale = yScale();
     maskTop.parent = containerObject;
 
-    maskBottom = Instantiate(
-      maskPrefab, 
-      Vector3.back * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, 
-      Quaternion.identity) as Transform;
-    maskBottom.localScale = new Vector3(
-      map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
-
+    maskBottom = createMask(Vector3.back);
+    maskBottom.localScale = yScale();
     maskBottom.parent = containerObject;
   }
 
