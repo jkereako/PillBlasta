@@ -94,10 +94,7 @@ public class MapGenerator: MonoBehaviour {
 
       Vector3 position;
       Transform obstacle;
-      Renderer theRenderer;
-      Material material;
       float height = 0.0f;
-      float colorGradientMultiplier = 0.0f;
 
       height = Mathf.Lerp(
         map.obstacleData.minHeight, map.obstacleData.maxHeight, (float)random.NextDouble()
@@ -105,25 +102,34 @@ public class MapGenerator: MonoBehaviour {
       position = map.CoordinateToPosition(coordinate);
       obstacle = Instantiate(
         prefab, position + Vector3.up * height / 2.0f, Quaternion.identity
-      );
-      obstacle.localScale = new Vector3(
-        (1 - map.tileSeparatorWidth) * map.tileSize, 
-        height, 
-        (1 - map.tileSeparatorWidth) * map.tileSize
-      );
+      ) as Transform;
 
-      // `colorGradientMultiplier` is a tile's position on the map relative to the total size of the
-      // map.
-      colorGradientMultiplier = (float)coordinate.y / (float)map.size.y;
-      theRenderer = obstacle.GetComponent<Renderer>();
-      material = new Material(theRenderer.sharedMaterial);
-      theRenderer.sharedMaterial = material;
-      material.color = Color.Lerp(
-        map.obstacleData.foregroundColor, map.obstacleData.backgroundColor, colorGradientMultiplier
-      );
+      ConfigureObstacle(map, coordinate, height, obstacle);
       
       obstacle.parent = containerObject;
     }
+  }
+
+  void ConfigureObstacle(Map map, Coordinate coordinate, float height, Transform obstacle) {
+    Renderer theRenderer;
+    Material material;
+    float colorGradientMultiplier = 0.0f;
+
+    obstacle.localScale = new Vector3(
+      (1 - map.tileSeparatorWidth) * map.tileSize, 
+      height, 
+      (1 - map.tileSeparatorWidth) * map.tileSize
+    );
+
+    // `colorGradientMultiplier` is a tile's position on the map relative to the total size of the
+    // map.
+    colorGradientMultiplier = (float)coordinate.y / (float)map.size.y;
+    theRenderer = obstacle.GetComponent<Renderer>();
+    material = new Material(theRenderer.sharedMaterial);
+    theRenderer.sharedMaterial = material;
+    material.color = Color.Lerp(
+      map.obstacleData.foregroundColor, map.obstacleData.backgroundColor, colorGradientMultiplier
+    );
   }
 
   void CreateMapMask(Map map, Transform maskPrefab, Transform containerObject) {
