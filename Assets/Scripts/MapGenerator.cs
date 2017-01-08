@@ -26,6 +26,7 @@ public class MapGenerator: MonoBehaviour {
     const string containerName = "GeneratedMap";
     Coordinate mapCenter = currentMap.center;
     Coordinate mapSize = currentMap.size;
+    System.Random random = new System.Random(currentMap.seed);
 
     tileCoordinates = new List<Coordinate>();
     for (int x = 0; x < mapSize.x; x++) {
@@ -62,6 +63,7 @@ public class MapGenerator: MonoBehaviour {
     // Generate the obstalces
     for (int i = 0; i < obstacleCount; i++) {
       Coordinate coordinate = GetRandomCoordinate();
+      float obstacleHeight = 0.0f;
       obstacleMap[coordinate.x, coordinate.y] = true;
       currentObstacleCount += 1;
 
@@ -71,9 +73,17 @@ public class MapGenerator: MonoBehaviour {
         continue;
       }
 
+      obstacleHeight = Mathf.Lerp(
+        currentMap.minObstacleHeight, currentMap.maxObstacleHeight, (float)random.NextDouble()
+      );
       Vector3 obstaclePosition = CoordinateToPosition(coordinate.x, coordinate.y);
-      Transform obstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * 0.5f, Quaternion.identity);
-      obstacle.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
+      Transform obstacle = Instantiate(
+                             obstaclePrefab, 
+                             obstaclePosition + Vector3.up * obstacleHeight / 2, 
+                             Quaternion.identity);
+      obstacle.localScale = new Vector3(
+        (1 - outLinePercent) * tileSize, obstacleHeight, (1 - outLinePercent) * tileSize
+      );
       obstacle.parent = containerObject;
     }
 
