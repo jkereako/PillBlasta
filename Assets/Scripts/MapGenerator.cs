@@ -26,7 +26,7 @@ public class MapGenerator: MonoBehaviour {
     Coordinate mapSize = currentMap.size;
     float tileSize = currentMap.tileSize;
     Vector2 maxMapSize = currentMap.maxSize;
-    System.Random random = new System.Random(currentMap.seed);
+
     GetComponent<BoxCollider>().size = new Vector3(
       currentMap.size.x * tileSize, 0.5f, currentMap.size.y * tileSize
     );
@@ -50,48 +50,7 @@ public class MapGenerator: MonoBehaviour {
 
     CreateTiles(currentMap, containerObject);
 
-    bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
-    int obstacleCount = (int)(mapSize.x * mapSize.y * currentMap.obstaclePercent);
-    int currentObstacleCount = 0;
-    // Generate the obstalces
-    for (int i = 0; i < obstacleCount; i++) {
-      Coordinate coordinate = GetRandomCoordinate();
-      float obstacleHeight = 0.0f;
-      Renderer obstacleRenderer;
-      Material obstacleMaterial;
-      float colorPercent = 0.0f;
-      obstacleMap[coordinate.x, coordinate.y] = true;
-      currentObstacleCount += 1;
-
-      if (coordinate == mapCenter || !currentMap.IsMapCompletelyAccessible(obstacleMap, i)) {
-        currentObstacleCount -= 1;
-        obstacleMap[coordinate.x, coordinate.y] = false;
-        continue;
-      }
-
-      obstacleHeight = Mathf.Lerp(
-        currentMap.obstacleData.minHeight, 
-        currentMap.obstacleData.maxHeight,
-        (float)random.NextDouble()
-      );
-      Vector3 obstaclePosition = currentMap.CoordinateToPosition(coordinate);
-      Transform obstacle = Instantiate(
-                             obstaclePrefab, 
-                             obstaclePosition + Vector3.up * obstacleHeight / 2.0f, 
-                             Quaternion.identity);
-      obstacle.localScale = new Vector3(
-        (1 - currentMap.tileSeparatorWidth) * tileSize, obstacleHeight, (1 - currentMap.tileSeparatorWidth) * tileSize
-      );
-      colorPercent = (float)coordinate.y / (float)currentMap.size.y;
-      obstacleRenderer = obstacle.GetComponent<Renderer>();
-      obstacleMaterial = new Material(obstacleRenderer.sharedMaterial);
-      obstacleRenderer.sharedMaterial = obstacleMaterial;
-      obstacleMaterial.color = Color.Lerp(
-        currentMap.obstacleData.foregroundColor, 
-        currentMap.obstacleData.backgroundColor,
-        colorPercent);
-      obstacle.parent = containerObject;
-    }
+    CreateObstacles(currentMap, obstaclePrefab, containerObject);
 
     CreateMapMask(currentMap, navMeshMaskPrefab, containerObject);
 
@@ -110,6 +69,56 @@ public class MapGenerator: MonoBehaviour {
         // Associate the tiles with the generated map.
         tile.parent = containerObject;
       }
+    }
+  }
+
+  void CreateObstacles(Map map, Transform prefab, Transform containerObject) {
+    System.Random random = new System.Random(map.seed);
+    bool[,] obstacleMap = new bool[(int)map.size.x, (int)map.size.y];
+    int limit = (int)(map.size.x * map.size.y * map.obstaclePercent);
+    int count = 0;
+
+    // Generate the obstalces
+    for (int i = 0; i < limit; i++) {
+      Vector3 position;
+      Transform obstacle;
+      Renderer obstacleRenderer;
+      Material obstacleMaterial;
+      Coordinate coordinate = GetRandomCoordinate();
+      float height = 0.0f;
+      float colorPercent = 0.0f;
+      obstacleMap[coordinate.x, coordinate.y] = true;
+      count += 1;
+
+      if (coordinate == map.center || !map.IsMapCompletelyAccessible(obstacleMap, i)) {
+        count -= 1;
+        obstacleMap[coordinate.x, coordinate.y] = false;
+        continue;
+      }
+
+      height = Mathf.Lerp(
+        map.obstacleData.minHeight, map.obstacleData.maxHeight, (float)random.NextDouble()
+      );
+      position = map.CoordinateToPosition(coordinate);
+      obstacle = Instantiate(
+        prefab, position + Vector3.up * height / 2.0f, Quaternion.identity
+      );
+      obstacle.localScale = new Vector3(
+        (1 - map.tileSeparatorWidth) * map.tileSize, 
+        height, 
+        (1 - map.tileSeparatorWidth) * map.tileSize
+      );
+
+      colorPercent = (float)coordinate.y / (float)map.size.y;
+      obstacleRenderer = obstacle.GetComponent<Renderer>();
+      obstacleMaterial = new Material(obstacleRenderer.sharedMaterial);
+      obstacleRenderer.sharedMaterial = obstacleMaterial;
+      obstacleMaterial.color = Color.Lerp(
+        map.obstacleData.foregroundColor, 
+        map.obstacleData.backgroundColor,
+        colorPercent);
+      
+      obstacle.parent = containerObject;
     }
   }
 
