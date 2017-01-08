@@ -6,6 +6,7 @@ public struct Map {
   public Coordinate size;
   public Vector2 maxSize;
   public int seed;
+  [Range(0, 1)]
   public float tileSeparatorWidth;
   public float tileSize;
   public Obstacle obstacleData;
