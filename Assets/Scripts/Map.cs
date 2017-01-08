@@ -65,4 +65,14 @@ public struct Map {
   public Vector3 CoordinateToPosition(Coordinate coordinate) {
     return new Vector3(-size.x / 2.0f + 0.5f + coordinate.x, 0, -size.y / 2.0f + 0.5f + coordinate.y) * tileSize;
   }
+
+  public Coordinate PositionToCoordinate(Vector3 position) {
+    int x = Mathf.RoundToInt(position.x / tileSize + (size.x - 1) / 2.0f);
+    // NOTE: `position.z` is intentional.
+    int y = Mathf.RoundToInt(position.z / tileSize + (size.y - 1) / 2.0f);
+    x = Mathf.Clamp(x, 0, size.x);
+    y = Mathf.Clamp(y, 0, size.y);
+
+    return new Coordinate(x, y);
+  }
 }
