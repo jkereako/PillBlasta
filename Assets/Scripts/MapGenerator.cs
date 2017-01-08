@@ -9,9 +9,6 @@ public class MapGenerator: MonoBehaviour {
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
   public Transform navMeshMaskPrefab;
- 
-  [Range(0, 1)]
-  public float outLinePercent;
 
   const string containerName = "GeneratedMap";
   Map currentMap;
@@ -51,16 +48,7 @@ public class MapGenerator: MonoBehaviour {
     Transform containerObject = new GameObject(containerName).transform;
     containerObject.parent = transform;
 
-    // Generate the tiles
-    for (int x = 0; x < mapSize.x; x++) {
-      for (int y = 0; y < mapSize.y; y++) {
-        Vector3 tilePosition = currentMap.CoordinateToPosition(new Coordinate(x, y));
-        Transform tile = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
-        tile.localScale = Vector3.one * (1 - outLinePercent) * tileSize;
-        // Associate the tiles with the generated map.
-        tile.parent = containerObject;
-      }
-    }
+    GenerateTiles(currentMap, containerObject);
 
     bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
     int obstacleCount = (int)(mapSize.x * mapSize.y * currentMap.obstaclePercent);
@@ -92,7 +80,7 @@ public class MapGenerator: MonoBehaviour {
                              obstaclePosition + Vector3.up * obstacleHeight / 2.0f, 
                              Quaternion.identity);
       obstacle.localScale = new Vector3(
-        (1 - outLinePercent) * tileSize, obstacleHeight, (1 - outLinePercent) * tileSize
+        (1 - currentMap.tileSeparatorWidth) * tileSize, obstacleHeight, (1 - currentMap.tileSeparatorWidth) * tileSize
       );
       colorPercent = (float)coordinate.y / (float)currentMap.size.y;
       obstacleRenderer = obstacle.GetComponent<Renderer>();
@@ -138,6 +126,21 @@ public class MapGenerator: MonoBehaviour {
     navMeshMaskBottom.parent = containerObject;
 
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
+  }
+
+  void GenerateTiles(Map map, Transform containerObject) {
+    for (int x = 0; x < map.size.x; x++) {
+      for (int y = 0; y < map.size.y; y++) {
+        Vector3 position;
+        Transform tile;
+
+        position = map.CoordinateToPosition(new Coordinate(x, y));
+        tile = Instantiate(tilePrefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
+        tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
+        // Associate the tiles with the generated map.
+        tile.parent = containerObject;
+      }
+    }
   }
 
   Coordinate GetRandomCoordinate() {
