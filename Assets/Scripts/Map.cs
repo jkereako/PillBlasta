@@ -21,12 +21,13 @@ public class Map {
 
   // This is an implementation of the Flood-fill 4 algorithm.
   public bool IsMapCompletelyAccessible(bool[,] obstacleMap, int obstacleCount) {
+    // Boolean arrays are initialized with false
     bool[,] mapFlags = new bool[obstacleMap.GetLength(0), obstacleMap.GetLength(1)];
     Queue<Coordinate> queue = new Queue<Coordinate>();
+    int accessibleTileCount = 0;
 
     queue.Enqueue(center);
     mapFlags[center.x, center.y] = true;
-    int accessibleTileCount = 0;
 
     while (queue.Count > 0) {
       Coordinate tile = queue.Dequeue();
@@ -41,14 +42,18 @@ public class Map {
 
           Coordinate neighbor = new Coordinate(tile.x + x, tile.y + y);
 
+          // `obstacleMap.GetLength(0)` returns the number of elements for the 0 dimension. This
+          // condition checks that we stay within the bounds of our map.
           if (neighbor.x >= 0 && neighbor.x < obstacleMap.GetLength(0) &&
               neighbor.y >= 0 && neighbor.y < obstacleMap.GetLength(1)) {
 
-            if (!mapFlags[neighbor.x, neighbor.y] && !obstacleMap[neighbor.x, neighbor.y]) {
-              mapFlags[neighbor.x, neighbor.y] = true;
-              queue.Enqueue(neighbor);
-              accessibleTileCount += 1;
+            if (mapFlags[neighbor.x, neighbor.y] || obstacleMap[neighbor.x, neighbor.y]) {
+              continue;
             }
+
+            mapFlags[neighbor.x, neighbor.y] = true;
+            queue.Enqueue(neighbor);
+            accessibleTileCount += 1;
           }
         }
       }
