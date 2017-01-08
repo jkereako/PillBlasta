@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [RequireComponent(typeof(BoxCollider))]
 public class MapGenerator: MonoBehaviour {
@@ -11,60 +12,60 @@ public class MapGenerator: MonoBehaviour {
   public Transform navMeshMaskPrefab;
 
   const string containerName = "GeneratedMap";
-  Map currentMap;
-  List<Coordinate> tileCoordinates;
   Queue<Coordinate> shuffledTileCoordinates;
+
 
   void Start() {
     GenerateMap();
   }
 
   public void GenerateMap() {
-    currentMap = maps[mapIndex];
-
-    Coordinate mapCenter = currentMap.center;
-    Coordinate mapSize = currentMap.size;
-    float tileSize = currentMap.tileSize;
-    Vector2 maxMapSize = currentMap.maxSize;
-
-    GetComponent<BoxCollider>().size = new Vector3(
-      currentMap.size.x * tileSize, 0.5f, currentMap.size.y * tileSize
-    );
-    tileCoordinates = new List<Coordinate>();
-    for (int x = 0; x < mapSize.x; x++) {
-      for (int y = 0; y < mapSize.y; y++) {
-        tileCoordinates.Add(new Coordinate(x, y));
-      }
-    }
-
-    shuffledTileCoordinates = new Queue<Coordinate>(Utility.Shuffle(tileCoordinates.ToArray(), currentMap.seed));
-
     // First, immediately destroy the container object if it already exists.
     if (transform.FindChild(containerName)) {
       DestroyImmediate(transform.FindChild(containerName).gameObject);
     }
-      
+
     // Next, create a new game object at run-time to contain all of the newly generated tiles.
     Transform containerObject = new GameObject(containerName).transform;
     containerObject.parent = transform;
+       
+    Map map = maps[mapIndex];
+    List<Coordinate> tileCoordinates = CreateTileCoordinates(map);
+    shuffledTileCoordinates = new Queue<Coordinate>(
+      Utility.Shuffle(tileCoordinates.ToArray(), map.seed)
+    );
 
-    CreateTiles(currentMap, containerObject);
+    CreateTiles(map, tilePrefab, containerObject);
+    CreateObstacles(map, obstaclePrefab, containerObject);
+    CreateMapMask(map, navMeshMaskPrefab, containerObject);
 
-    CreateObstacles(currentMap, obstaclePrefab, containerObject);
+    GetComponent<BoxCollider>().size = new Vector3(
+      map.size.x * map.tileSize, 0.5f, map.size.y * map.tileSize
+    );
 
-    CreateMapMask(currentMap, navMeshMaskPrefab, containerObject);
-
-    navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
+    navMeshFloor.localScale = new Vector3(map.maxSize.x, map.maxSize.y) * map.tileSize;
   }
 
-  void CreateTiles(Map map, Transform containerObject) {
+  List<Coordinate> CreateTileCoordinates(Map map) {
+    List<Coordinate> coordinates = new List<Coordinate>();
+
+    for (int x = 0; x < map.size.x; x++) {
+      for (int y = 0; y < map.size.y; y++) {
+        coordinates.Add(new Coordinate(x, y));
+      }
+    }
+
+    return coordinates;
+  }
+
+  void CreateTiles(Map map, Transform prefab, Transform containerObject) {
     for (int x = 0; x < map.size.x; x++) {
       for (int y = 0; y < map.size.y; y++) {
         Vector3 position;
         Transform tile;
 
         position = map.CoordinateToPosition(new Coordinate(x, y));
-        tile = Instantiate(tilePrefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
+        tile = Instantiate(prefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
 
         // Associate the tiles with the generated map.
@@ -161,7 +162,6 @@ public class MapGenerator: MonoBehaviour {
       Quaternion.identity) as Transform;
     maskBottom.localScale = new Vector3(
       map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
-
 
     maskBottom.parent = containerObject;
   }
