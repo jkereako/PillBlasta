@@ -14,7 +14,6 @@ public class MapGenerator: MonoBehaviour {
   const string containerName = "GeneratedMap";
   Queue<Coordinate> shuffledTileCoordinates;
 
-
   void Start() {
     GenerateMap();
   }
