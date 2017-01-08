@@ -10,7 +10,7 @@ public class Map {
   public float tileSize;
   public Obstacle obstacleData;
   [Range(0, 1)]
-  public float obstaclePercent;
+  public float obstacleFill;
 
   public Coordinate center {
     get {

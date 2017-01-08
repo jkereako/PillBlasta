@@ -77,7 +77,7 @@ public class MapGenerator: MonoBehaviour {
     System.Random random = new System.Random(map.seed);
     // Creates a 2D array of bools that is initialized to false.
     bool[,] obstacleMap = new bool[(int)map.size.x, (int)map.size.y];
-    int limit = (int)(map.size.x * map.size.y * map.obstaclePercent);
+    int limit = (int)(map.size.x * map.size.y * map.obstacleFill);
     int obstacleCount = 0;
 
     // Generate the obstalces
