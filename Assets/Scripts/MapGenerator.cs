@@ -48,7 +48,7 @@ public class MapGenerator: MonoBehaviour {
     Transform containerObject = new GameObject(containerName).transform;
     containerObject.parent = transform;
 
-    GenerateTiles(currentMap, containerObject);
+    CreateTiles(currentMap, containerObject);
 
     bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
     int obstacleCount = (int)(mapSize.x * mapSize.y * currentMap.obstaclePercent);
@@ -98,7 +98,7 @@ public class MapGenerator: MonoBehaviour {
     navMeshFloor.localScale = new Vector3(maxMapSize.x, maxMapSize.y) * tileSize;
   }
 
-  void GenerateTiles(Map map, Transform containerObject) {
+  void CreateTiles(Map map, Transform containerObject) {
     for (int x = 0; x < map.size.x; x++) {
       for (int y = 0; y < map.size.y; y++) {
         Vector3 position;
