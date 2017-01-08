@@ -1,4 +1,6 @@
-﻿public static class Utility {
+﻿using System.Collections.Generic;
+
+public static class Utility {
 
   // Implementation of the Fisher-Yates shuffle algorithm.
   // https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
@@ -12,5 +14,13 @@
     }
 
     return array;
+  }
+
+  public static T CycleQueue<T>(Queue<T> queue) {
+    // This cleaver trick ensures we never run out of objects in the queue.
+    T anObject = queue.Dequeue();
+    queue.Enqueue(anObject);
+
+    return anObject;
   }
 }

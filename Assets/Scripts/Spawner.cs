@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Spawner: MonoBehaviour {
   public Enemy enemy;
@@ -9,8 +11,11 @@ public class Spawner: MonoBehaviour {
   int spawnCount;
   int activeCount;
   float nextSpawnTime;
+  MapGenerator mapGenerator;
 
   void Start() {
+    mapGenerator = FindObjectOfType<MapGenerator>();
+
     NextWave();
   }
 
@@ -22,7 +27,32 @@ public class Spawner: MonoBehaviour {
     spawnCount -= 1;
     nextSpawnTime = Time.time + currentWave.waitValue;
 
-    Enemy spawn = Instantiate(enemy, Vector3.zero, Quaternion.identity) as Enemy;
+    StartCoroutine(Spawn());
+  }
+
+  IEnumerator Spawn() {
+    Queue<Coordinate> coordinateQueue;
+    const float delay = 1.0f;
+    const float flashSpeed = 4.0f;
+    float timer = 0.0f;
+    coordinateQueue = new Queue<Coordinate>(
+      Utility.Shuffle(mapGenerator.map.openTileCoordinates, mapGenerator.map.seed)
+    );
+
+    Coordinate coordinate = Utility.CycleQueue(coordinateQueue);
+    Transform tile = mapGenerator.tiles[coordinate.x, coordinate.y];
+    Material material = tile.GetComponent<Renderer>().material;
+    Color initialColor = material.color;
+    Color flashColor = Color.red;
+
+    // Flash the tile
+    while (timer < delay) {
+      material.color = Color.Lerp(initialColor, flashColor, Mathf.PingPong(timer * flashSpeed, 1));
+      timer += Time.deltaTime;
+      yield return null;
+    }
+
+    Enemy spawn = Instantiate(enemy, tile.position + Vector3.up, Quaternion.identity);
     // Assign the delegate `OnEnemyDeath`
     spawn.OnDeath += OnEnemyDeath;
   }

@@ -6,15 +6,18 @@ using System;
 public class MapGenerator: MonoBehaviour {
   public Map[] maps;
   public int mapIndex;
+  public Map map;
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
   public Transform navMeshMaskPrefab;
+  public Transform[,] tiles;
 
   const string containerName = "GeneratedMap";
-  Queue<Coordinate> shuffledTileCoordinates;
 
   void Start() {
+    map = maps[mapIndex];
+
     GenerateMap();
   }
 
@@ -27,15 +30,28 @@ public class MapGenerator: MonoBehaviour {
     // Next, create a new game object at run-time to contain all of the newly generated tiles.
     Transform containerObject = new GameObject(containerName).transform;
     containerObject.parent = transform;
-       
-    Map map = maps[mapIndex];
-    List<Coordinate> tileCoordinates = CreateTileCoordinates(map);
+  
+    Queue<Coordinate> shuffledTileCoordinates;
+
+    map.tileCoordinates = CreateTileCoordinates(map);
+    CreateTiles(map, tilePrefab, containerObject);
+
     shuffledTileCoordinates = new Queue<Coordinate>(
-      Utility.Shuffle(tileCoordinates.ToArray(), map.seed)
+      Utility.Shuffle(map.tileCoordinates, map.seed)
+    );
+      
+
+    map.obstacleCoordinates = CreateObstacles(
+      map, shuffledTileCoordinates, obstaclePrefab, containerObject
     );
 
-    CreateTiles(map, tilePrefab, containerObject);
-    CreateObstacles(map, obstaclePrefab, containerObject);
+
+      
+    HashSet<Coordinate> openCoordinatesSet = new HashSet<Coordinate>(map.tileCoordinates);
+    map.openTileCoordinates = new Coordinate[openCoordinatesSet.Count];
+    openCoordinatesSet.SymmetricExceptWith(map.obstacleCoordinates);
+    openCoordinatesSet.CopyTo(map.openTileCoordinates);
+
     CreateMapMask(map, navMeshMaskPrefab, containerObject);
 
     GetComponent<BoxCollider>().size = new Vector3(
@@ -45,7 +61,7 @@ public class MapGenerator: MonoBehaviour {
     navMeshFloor.localScale = new Vector3(map.maxSize.x, map.maxSize.y) * map.tileSize;
   }
 
-  List<Coordinate> CreateTileCoordinates(Map map) {
+  Coordinate[] CreateTileCoordinates(Map map) {
     List<Coordinate> coordinates = new List<Coordinate>();
 
     for (int x = 0; x < map.size.x; x++) {
@@ -54,10 +70,12 @@ public class MapGenerator: MonoBehaviour {
       }
     }
 
-    return coordinates;
+    return coordinates.ToArray();
   }
 
   void CreateTiles(Map map, Transform prefab, Transform containerObject) {
+    tiles = new Transform[map.size.x, map.size.y];
+
     for (int x = 0; x < map.size.x; x++) {
       for (int y = 0; y < map.size.y; y++) {
         Vector3 position;
@@ -67,22 +85,24 @@ public class MapGenerator: MonoBehaviour {
         tile = Instantiate(prefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
 
+        tiles[x, y] = tile;
         // Associate the tiles with the generated map.
         tile.parent = containerObject;
       }
     }
   }
 
-  void CreateObstacles(Map map, Transform prefab, Transform containerObject) {
+  Coordinate[] CreateObstacles(Map map, Queue<Coordinate> coordinateQueue, Transform prefab, Transform containerObject) {
     System.Random random = new System.Random(map.seed);
     // Creates a 2D array of bools that is initialized to false.
     bool[,] obstacleMap = new bool[(int)map.size.x, (int)map.size.y];
     int limit = (int)(map.size.x * map.size.y * map.obstacleFill);
     int obstacleCount = 0;
+    List<Coordinate> coordinates = new List<Coordinate>();
 
     // Generate the obstalces
     for (int i = 0; i < limit; i++) {
-      Coordinate coordinate = GetRandomCoordinate();
+      Coordinate coordinate = Utility.CycleQueue(coordinateQueue);
       obstacleMap[coordinate.x, coordinate.y] = true;
       obstacleCount += 1;
 
@@ -92,6 +112,7 @@ public class MapGenerator: MonoBehaviour {
         continue;
       }
 
+      coordinates.Add(coordinate);
       Vector3 position;
       Transform obstacle;
       float height = 0.0f;
@@ -108,6 +129,8 @@ public class MapGenerator: MonoBehaviour {
       
       obstacle.parent = containerObject;
     }
+
+    return coordinates.ToArray();
   }
 
   void ConfigureObstacle(Map map, Coordinate coordinate, float height, Transform obstacle) {
@@ -167,13 +190,5 @@ public class MapGenerator: MonoBehaviour {
     maskBottom = createMask(Vector3.back);
     maskBottom.localScale = yScale();
     maskBottom.parent = containerObject;
-  }
-
-  Coordinate GetRandomCoordinate() {
-    // This cleaver trick ensures we never run out of coordinates.
-    Coordinate coordinate = shuffledTileCoordinates.Dequeue();
-    shuffledTileCoordinates.Enqueue(coordinate);
-
-    return coordinate;
   }
 }

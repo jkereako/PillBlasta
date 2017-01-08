@@ -12,6 +12,9 @@ public struct Map {
   public Obstacle obstacleData;
   [Range(0, 1)]
   public float obstacleFill;
+  public Coordinate[] tileCoordinates;
+  public Coordinate[] obstacleCoordinates;
+  public Coordinate[] openTileCoordinates;
 
   public Coordinate center {
     get {
