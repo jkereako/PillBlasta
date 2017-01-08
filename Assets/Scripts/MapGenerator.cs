@@ -66,6 +66,7 @@ public class MapGenerator: MonoBehaviour {
         position = map.CoordinateToPosition(new Coordinate(x, y));
         tile = Instantiate(tilePrefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
+
         // Associate the tiles with the generated map.
         tile.parent = containerObject;
       }
@@ -92,10 +93,10 @@ public class MapGenerator: MonoBehaviour {
 
       Vector3 position;
       Transform obstacle;
-      Renderer obstacleRenderer;
-      Material obstacleMaterial;
+      Renderer theRenderer;
+      Material material;
       float height = 0.0f;
-      float colorPercent = 0.0f;
+      float colorGradientMultiplier = 0.0f;
 
       height = Mathf.Lerp(
         map.obstacleData.minHeight, map.obstacleData.maxHeight, (float)random.NextDouble()
@@ -110,14 +111,15 @@ public class MapGenerator: MonoBehaviour {
         (1 - map.tileSeparatorWidth) * map.tileSize
       );
 
-      colorPercent = (float)coordinate.y / (float)map.size.y;
-      obstacleRenderer = obstacle.GetComponent<Renderer>();
-      obstacleMaterial = new Material(obstacleRenderer.sharedMaterial);
-      obstacleRenderer.sharedMaterial = obstacleMaterial;
-      obstacleMaterial.color = Color.Lerp(
-        map.obstacleData.foregroundColor, 
-        map.obstacleData.backgroundColor,
-        colorPercent);
+      // `colorGradientMultiplier` is a tile's position on the map relative to the total size of the
+      // map.
+      colorGradientMultiplier = (float)coordinate.y / (float)map.size.y;
+      theRenderer = obstacle.GetComponent<Renderer>();
+      material = new Material(theRenderer.sharedMaterial);
+      theRenderer.sharedMaterial = material;
+      material.color = Color.Lerp(
+        map.obstacleData.foregroundColor, map.obstacleData.backgroundColor, colorGradientMultiplier
+      );
       
       obstacle.parent = containerObject;
     }
@@ -159,6 +161,8 @@ public class MapGenerator: MonoBehaviour {
       Quaternion.identity) as Transform;
     maskBottom.localScale = new Vector3(
       map.maxSize.x, 1, (map.maxSize.y - map.size.y) / 2.0f) * map.tileSize;
+
+
     maskBottom.parent = containerObject;
   }
 
