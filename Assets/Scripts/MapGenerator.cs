@@ -78,16 +78,16 @@ public class MapGenerator: MonoBehaviour {
     // Creates a 2D array of bools that is initialized to false.
     bool[,] obstacleMap = new bool[(int)map.size.x, (int)map.size.y];
     int limit = (int)(map.size.x * map.size.y * map.obstaclePercent);
-    int count = 0;
+    int obstacleCount = 0;
 
     // Generate the obstalces
     for (int i = 0; i < limit; i++) {
       Coordinate coordinate = GetRandomCoordinate();
       obstacleMap[coordinate.x, coordinate.y] = true;
-      count += 1;
+      obstacleCount += 1;
 
-      if (coordinate == map.center || !map.IsMapCompletelyAccessible(obstacleMap, i)) {
-        count -= 1;
+      if (coordinate == map.center || !map.IsMapCompletelyAccessible(obstacleMap, obstacleCount)) {
+        obstacleCount -= 1;
         obstacleMap[coordinate.x, coordinate.y] = false;
         continue;
       }
