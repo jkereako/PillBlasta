@@ -132,10 +132,10 @@ public class MapGenerator: MonoBehaviour {
     // https://youtu.be/vQgLdFNrCN8?t=405
     Transform maskLeft, maskRight, maskTop, maskBottom;
 
-    Func<Vector3, Transform> createMask = (Vector3 v) => { 
+    Func<Vector3, Transform> createMask = (v) => { 
       return Instantiate(
         maskPrefab, v * (map.size.x + map.maxSize.x) / 4.0f * map.tileSize, Quaternion.identity
-      ) as Transform;
+      );
     };
 
     Func<Vector3> xScale = () => { 
