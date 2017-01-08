@@ -23,7 +23,7 @@ public class Map {
     // Boolean arrays are initialized with false
     bool[,] visitedNeighbors = new bool[size.x, size.y];
     Queue<Coordinate> queue = new Queue<Coordinate>();
-    int accessibleTileCount = 0;
+    int accessibleTileCount = 1;
     int walkableTileCount = size.x * size.y - obstacleCount;
 
     Coordinate[] neighborOffsets = { 
