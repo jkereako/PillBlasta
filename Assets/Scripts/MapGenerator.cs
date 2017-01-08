@@ -102,7 +102,7 @@ public class MapGenerator: MonoBehaviour {
       position = map.CoordinateToPosition(coordinate);
       obstacle = Instantiate(
         prefab, position + Vector3.up * height / 2.0f, Quaternion.identity
-      ) as Transform;
+      );
 
       ConfigureObstacle(map, coordinate, height, obstacle);
       

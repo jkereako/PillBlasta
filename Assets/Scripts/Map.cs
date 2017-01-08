@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 [System.Serializable]
-public class Map {
+public struct Map {
   public Coordinate size;
   public Vector2 maxSize;
   public int seed;
