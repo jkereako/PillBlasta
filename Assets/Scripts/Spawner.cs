@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 
 public class Spawner: MonoBehaviour {
   public Enemy enemy;
@@ -37,45 +38,55 @@ public class Spawner: MonoBehaviour {
     spawnCount -= 1;
     nextSpawnTime = Time.time + currentWave.waitValue;
 
-    StartCoroutine(Spawn());
+    Spawn();
   }
 
-  IEnumerator Spawn() {
-    const float delay = 1.0f;
-    const float flashSpeed = 4.0f;
-    float timer = 0.0f;
+  void Spawn() {
     Transform tile;
+    Enemy spawn;
+    tile = FindSpawnableTile(mapGenerator.map, player.position, playerCampManager);
+
+    StartCoroutine(FlashTile(tile, Color.red));
+
+    spawn = Instantiate(enemy, tile.position + Vector3.up, Quaternion.identity);
+    // Assign the delegate `OnEnemyDeath`
+    spawn.OnDeath += OnEnemyDeath;
+  }
+
+  Transform FindSpawnableTile(Map map, Vector3 playerPosition, PlayerCampManager aPlayerCampManager) {
     Coordinate coordinate;
 
     // Prevent the player from chilling in a corner.
-    if (playerCampManager.isPlayerCamped) {
-      coordinate = mapGenerator.map.PositionToCoordinate(player.position);
+    if (aPlayerCampManager.isPlayerCamped) {
+      coordinate = map.PositionToCoordinate(playerPosition);
     }
     else {
       Queue<Coordinate> coordinateQueue;
       coordinateQueue = new Queue<Coordinate>(
-        Utility.Shuffle(mapGenerator.map.openTileCoordinates, mapGenerator.map.seed)
+        Utility.Shuffle(map.openTileCoordinates, map.seed)
       );
 
       coordinate = Utility.CycleQueue(coordinateQueue);
     }
 
-    tile = mapGenerator.tiles[coordinate.x, coordinate.y];
+    return mapGenerator.tiles[coordinate.x, coordinate.y];
+  }
 
-    Material material = tile.GetComponent<Renderer>().material;
-    Color initialColor = material.color;
-    Color flashColor = Color.red;
+  IEnumerator FlashTile(Transform tile, Color flashColor) {
+    const float delay = 1.0f;
+    const float flashSpeed = 4.0f;
+    float timer = 0.0f;
+    Material material;
+    Color initialColor;
 
+    material = tile.GetComponent<Renderer>().material;
+    initialColor = material.color;
     // Flash the tile
     while (timer < delay) {
       material.color = Color.Lerp(initialColor, flashColor, Mathf.PingPong(timer * flashSpeed, 1));
       timer += Time.deltaTime;
       yield return null;
     }
-
-    Enemy spawn = Instantiate(enemy, tile.position + Vector3.up, Quaternion.identity);
-    // Assign the delegate `OnEnemyDeath`
-    spawn.OnDeath += OnEnemyDeath;
   }
 
   void OnEnemyDeath() {

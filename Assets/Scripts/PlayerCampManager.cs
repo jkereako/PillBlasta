@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 // Prevent the player from staying in one spot too long.
-public struct PlayerCampManager {
+public class PlayerCampManager {
   readonly Transform player;
   Vector3 lastPosition;
   const float timeDelay = 2.0f;
