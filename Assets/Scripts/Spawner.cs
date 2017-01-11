@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 
 public class Spawner: MonoBehaviour {
   public Enemy enemy;
   public Wave[] waves;
+
+  public event System.Action<Wave, int> OnNewWave;
 
   LiveEntity playerEntity;
   Transform player;
@@ -44,7 +45,7 @@ public class Spawner: MonoBehaviour {
   void Spawn() {
     Transform tile;
     Enemy spawn;
-    tile = FindSpawnableTile(mapGenerator.map, player.position, playerCampManager);
+    tile = FindSpawnableTile(mapGenerator.GetActiveMap(), player.position, playerCampManager);
 
     StartCoroutine(FlashTile(tile, Color.red));
 
@@ -69,7 +70,7 @@ public class Spawner: MonoBehaviour {
       coordinate = Utility.CycleQueue(coordinateQueue);
     }
 
-    return mapGenerator.tiles[coordinate.x, coordinate.y];
+    return mapGenerator.GetMapTiles()[coordinate.x, coordinate.y];
   }
 
   IEnumerator FlashTile(Transform tile, Color flashColor) {
@@ -102,10 +103,13 @@ public class Spawner: MonoBehaviour {
   }
 
   void NextWave() {
-    Debug.Log("Wave: " + waveIndex);
-
     currentWave = waves[waveIndex];
     activeCount = spawnCount = currentWave.entityCount;
+
+    if (OnNewWave != null) {
+      OnNewWave(currentWave, waveIndex);
+    }
+
     waveIndex += 1;
   }
 }

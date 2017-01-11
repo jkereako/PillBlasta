@@ -12,8 +12,12 @@ public struct Map {
   public Obstacle obstacleData;
   [Range(0, 1)]
   public float obstacleFill;
+
+  [HideInInspector]
   public Coordinate[] tileCoordinates;
+  [HideInInspector]
   public Coordinate[] obstacleCoordinates;
+  [HideInInspector]
   public Coordinate[] openTileCoordinates;
 
   public Coordinate center {

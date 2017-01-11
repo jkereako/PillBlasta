@@ -5,23 +5,36 @@ using System;
 [RequireComponent(typeof(BoxCollider))]
 public class MapGenerator: MonoBehaviour {
   public Map[] maps;
-  public int mapIndex;
-  public Map map;
+  public int mapIndex = 0;
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
   public Transform navMeshMaskPrefab;
-  public Transform[,] tiles;
+
+  Transform[,] tiles;
+  Map map;
 
   const string containerName = "GeneratedMap";
 
-  void Start() {
-    map = maps[mapIndex];
+  void Awake() {
+    FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
+  }
 
+  public Map GetActiveMap() {
+    return map;
+  }
+
+  public Transform[,] GetMapTiles() {
+    return tiles;
+  }
+
+  public void OnNewWave(Wave wave, int index) {
+    mapIndex = Mathf.Clamp(index, 0, maps.Length);
     GenerateMap();
   }
 
   public void GenerateMap() {
+    map = maps[mapIndex];
     // First, immediately destroy the container object if it already exists.
     if (transform.FindChild(containerName)) {
       DestroyImmediate(transform.FindChild(containerName).gameObject);
@@ -36,6 +49,7 @@ public class MapGenerator: MonoBehaviour {
     containerObject.parent = transform;
 
     map.tileCoordinates = CreateTileCoordinates(map);
+
     tiles = CreateTiles(map, tilePrefab, containerObject);
 
     shuffledTileCoordinates = new Queue<Coordinate>(
@@ -69,7 +83,7 @@ public class MapGenerator: MonoBehaviour {
         coordinates.Add(new Coordinate(x, y));
       }
     }
-
+      
     return coordinates.ToArray();
   }
 
