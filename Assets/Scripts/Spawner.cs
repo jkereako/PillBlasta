@@ -49,7 +49,6 @@ public class Spawner: MonoBehaviour {
 
     // Prevent the player from chilling in a corner.
     if (playerCampManager.isPlayerCamped) {
-      Debug.Log("Player is camped");
       coordinate = mapGenerator.map.PositionToCoordinate(player.position);
     }
     else {
