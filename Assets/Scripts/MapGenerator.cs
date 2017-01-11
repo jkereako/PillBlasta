@@ -28,26 +28,26 @@ public class MapGenerator: MonoBehaviour {
     }
 
     // Next, create a new game object at run-time to contain all of the newly generated tiles.
-    Transform containerObject = new GameObject(containerName).transform;
-    containerObject.parent = transform;
-  
+    Transform containerObject;
     Queue<Coordinate> shuffledTileCoordinates;
+    HashSet<Coordinate> openCoordinatesSet;
+
+    containerObject = new GameObject(containerName).transform;
+    containerObject.parent = transform;
 
     map.tileCoordinates = CreateTileCoordinates(map);
-    CreateTiles(map, tilePrefab, containerObject);
+    tiles = CreateTiles(map, tilePrefab, containerObject);
 
     shuffledTileCoordinates = new Queue<Coordinate>(
       Utility.Shuffle(map.tileCoordinates, map.seed)
     );
       
-
-    map.obstacleCoordinates = CreateObstacles(
+    map.obstacleCoordinates = CreateObstacleCoordinates(
       map, shuffledTileCoordinates, obstaclePrefab, containerObject
     );
 
-
-      
-    HashSet<Coordinate> openCoordinatesSet = new HashSet<Coordinate>(map.tileCoordinates);
+    // Find coordinates without an obstacle
+    openCoordinatesSet = new HashSet<Coordinate>(map.tileCoordinates);
     map.openTileCoordinates = new Coordinate[openCoordinatesSet.Count];
     openCoordinatesSet.SymmetricExceptWith(map.obstacleCoordinates);
     openCoordinatesSet.CopyTo(map.openTileCoordinates);
@@ -73,8 +73,8 @@ public class MapGenerator: MonoBehaviour {
     return coordinates.ToArray();
   }
 
-  void CreateTiles(Map map, Transform prefab, Transform containerObject) {
-    tiles = new Transform[map.size.x, map.size.y];
+  Transform[,] CreateTiles(Map map, Transform prefab, Transform containerObject) {
+    Transform[,] someTiles = new Transform[map.size.x, map.size.y];
 
     for (int x = 0; x < map.size.x; x++) {
       for (int y = 0; y < map.size.y; y++) {
@@ -85,14 +85,16 @@ public class MapGenerator: MonoBehaviour {
         tile = Instantiate(prefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
 
-        tiles[x, y] = tile;
+        someTiles[x, y] = tile;
         // Associate the tiles with the generated map.
         tile.parent = containerObject;
       }
     }
+
+    return someTiles;
   }
 
-  Coordinate[] CreateObstacles(Map map, Queue<Coordinate> coordinateQueue, Transform prefab, Transform containerObject) {
+  Coordinate[] CreateObstacleCoordinates(Map map, Queue<Coordinate> coordinateQueue, Transform prefab, Transform containerObject) {
     System.Random random = new System.Random(map.seed);
     // Creates a 2D array of bools that is initialized to false.
     bool[,] obstacleMap = new bool[(int)map.size.x, (int)map.size.y];
