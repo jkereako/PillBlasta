@@ -59,7 +59,7 @@ public class Spawner: MonoBehaviour {
 
     // Prevent the player from chilling in a corner.
     if (aPlayerCampManager.isPlayerCamped) {
-      coordinate = map.PositionToCoordinate(playerPosition);
+      coordinate = map.CoordinateForPosition(playerPosition);
     }
     else {
       Queue<Coordinate> coordinateQueue;

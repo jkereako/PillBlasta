@@ -20,9 +20,15 @@ public struct Map {
   [HideInInspector]
   public Coordinate[] openTileCoordinates;
 
-  public Coordinate center {
+  public Coordinate centerCoordinate {
     get {
       return new Coordinate(size.x / 2, size.y / 2);
+    }
+  }
+
+  public Vector3 centerPosition {
+    get {
+      return PositionForCoordinate(centerCoordinate);
     }
   }
 
@@ -36,13 +42,13 @@ public struct Map {
 
     Coordinate[] neighborOffsets = { 
       new Coordinate(-1, 0), // Left 
-      new Coordinate(0, 1), // Top
-      new Coordinate(1, 0), // Right
-      new Coordinate(0, -1) // Bottom
+      new Coordinate(0, 1),  // Top
+      new Coordinate(1, 0),  // Right
+      new Coordinate(0, -1)  // Bottom
     };
 
-    queue.Enqueue(center);
-    visitedNeighbors[center.x, center.y] = true;
+    queue.Enqueue(centerCoordinate);
+    visitedNeighbors[centerCoordinate.x, centerCoordinate.y] = true;
 
     while (queue.Count > 0) {
       Coordinate tile = queue.Dequeue();
@@ -66,11 +72,11 @@ public struct Map {
     return walkableTileCount == accessibleTileCount;
   }
 
-  public Vector3 CoordinateToPosition(Coordinate coordinate) {
+  public Vector3 PositionForCoordinate(Coordinate coordinate) {
     return new Vector3(-size.x / 2.0f + 0.5f + coordinate.x, 0, -size.y / 2.0f + 0.5f + coordinate.y) * tileSize;
   }
 
-  public Coordinate PositionToCoordinate(Vector3 position) {
+  public Coordinate CoordinateForPosition(Vector3 position) {
     int x = Mathf.RoundToInt(position.x / tileSize + (size.x - 1) / 2.0f);
     // NOTE: `position.z` is intentional.
     int y = Mathf.RoundToInt(position.z / tileSize + (size.y - 1) / 2.0f);

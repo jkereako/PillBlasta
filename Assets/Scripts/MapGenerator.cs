@@ -95,7 +95,7 @@ public class MapGenerator: MonoBehaviour {
         Vector3 position;
         Transform tile;
 
-        position = map.CoordinateToPosition(new Coordinate(x, y));
+        position = map.PositionForCoordinate(new Coordinate(x, y));
         tile = Instantiate(prefab, position, Quaternion.Euler(Vector3.right * 90)) as Transform;
         tile.localScale = Vector3.one * (1 - map.tileSeparatorWidth) * map.tileSize;
 
@@ -122,7 +122,7 @@ public class MapGenerator: MonoBehaviour {
       obstacleMap[coordinate.x, coordinate.y] = true;
       obstacleCount += 1;
 
-      if (coordinate == map.center || !map.IsMapCompletelyAccessible(obstacleMap, obstacleCount)) {
+      if (coordinate == map.centerCoordinate || !map.IsMapCompletelyAccessible(obstacleMap, obstacleCount)) {
         obstacleCount -= 1;
         obstacleMap[coordinate.x, coordinate.y] = false;
         continue;
@@ -136,7 +136,7 @@ public class MapGenerator: MonoBehaviour {
       height = Mathf.Lerp(
         map.obstacleData.minHeight, map.obstacleData.maxHeight, (float)random.NextDouble()
       );
-      position = map.CoordinateToPosition(coordinate);
+      position = map.PositionForCoordinate(coordinate);
       obstacle = Instantiate(
         prefab, position + Vector3.up * height / 2.0f, Quaternion.identity
       );
