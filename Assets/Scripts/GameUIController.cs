@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameUIController : MonoBehaviour {
   public Image fadePlane;
@@ -8,6 +9,10 @@ public class GameUIController : MonoBehaviour {
 
   void Awake() {
     FindObjectOfType<Player>().OnDeath += OnGameOver;
+  }
+
+  public void StartNewGame() {
+    SceneManager.LoadScene("Main");
   }
 
   void OnGameOver() {
