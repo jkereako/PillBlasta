@@ -4,6 +4,12 @@
 public class PlayerController: MonoBehaviour {
   Rigidbody rigidBody;
   Vector3 velocity;
+  Map[] maps;
+
+  void Awake() {
+    maps = FindObjectOfType<MapGenerator>().maps;
+    FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
+  }
 
   void Start() {
     rigidBody = GetComponent<Rigidbody>();
@@ -22,5 +28,9 @@ public class PlayerController: MonoBehaviour {
     // so that it is at eye-level with the player.
     Vector3 correctedPoint = new Vector3(point.x, transform.position.y, point.z);
     transform.LookAt(correctedPoint);
+  }
+
+  public void OnNewWave(Wave wave, int index) {
+    transform.position = maps[index].centerPosition + Vector3.up * 3;
   }
 }
