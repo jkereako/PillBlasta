@@ -2,7 +2,9 @@
 
 public class Weapon: MonoBehaviour {
   public Transform muzzle;
+  public Transform ejector;
   public Projectile projectile;
+  public Transform shell;
   public float fireRate = 100;
   public float muzzleVelocity = 35;
 
@@ -13,8 +15,12 @@ public class Weapon: MonoBehaviour {
       return;
     }
 
+    Projectile aProjectile;
+
     nextShotTime = Time.time + fireRate / 1000;
-    Projectile aProjectile = Instantiate(projectile, muzzle.position, muzzle.rotation) as Projectile;
+    aProjectile = Instantiate(projectile, muzzle.position, muzzle.rotation);
     aProjectile.SetSpeed(muzzleVelocity);
+
+    Instantiate(shell, ejector.position, ejector.rotation);
   }
 }
