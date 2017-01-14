@@ -11,6 +11,8 @@ public class Enemy: LiveEntity {
 
   ;
 
+  public ParticleSystem deathEffect;
+
   State state;
   NavMeshAgent pathFinder;
   Material material;
@@ -45,6 +47,22 @@ public class Enemy: LiveEntity {
     collisionRadius = GetComponent<CapsuleCollider>().radius;
     targetCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
     StartCoroutine(UpdatePath());
+  }
+
+  public override void TakeHit(float damage, RaycastHit hit) {
+    if (damage >= health) {
+      GameObject particles;
+
+      particles = Instantiate(
+        deathEffect.gameObject,
+        hit.point, 
+        Quaternion.FromToRotation(hit.point, Vector3.forward)
+      );
+
+      Destroy(particles, 2);
+    }
+
+    base.TakeHit(damage, hit);
   }
 
   void Update() {
