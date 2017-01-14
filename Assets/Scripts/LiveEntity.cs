@@ -25,6 +25,9 @@ public class LiveEntity: MonoBehaviour, IDamageable {
     }
   }
 
+  // Adds an item to the context menu when right-clicking on the script in Unity. Selecting the menu
+  // item "Kill" will immediately execute the method Die().
+  [ContextMenu("Kill")]
   protected void Die() {
     isAlive = false;
 
