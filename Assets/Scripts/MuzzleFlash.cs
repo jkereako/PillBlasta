@@ -12,7 +12,6 @@ public class MuzzleFlash: MonoBehaviour {
   }
 
   IEnumerator Flash() {
-    float time = 0.0f;
     int spriteIndex = Random.Range(0, sprites.Length);
 
     for (int i = 0; i < spriteRenderers.Length; i++) {
@@ -21,10 +20,7 @@ public class MuzzleFlash: MonoBehaviour {
 
     flash.SetActive(true);
 
-    while (time < animationDuration) {
-      time += Time.deltaTime;
-      yield return null;
-    }
+    yield return new WaitForSeconds(animationDuration);
 
     flash.SetActive(false);
   }
