@@ -11,11 +11,6 @@ public class Weapon: MonoBehaviour {
   public float muzzleVelocity = 35;
 
   float nextShotTime;
-  MuzzleFlash muzzleFlash;
-
-  public void Start() {
-    muzzleFlash = GetComponent<MuzzleFlash>();
-  }
 
   public void Fire() {
     if (Time.time < nextShotTime) {
@@ -23,12 +18,12 @@ public class Weapon: MonoBehaviour {
     }
 
     Projectile aProjectile;
-
+    MuzzleFlash muzzleFlash = GetComponent<MuzzleFlash>();
     nextShotTime = Time.time + fireRate / 1000;
     aProjectile = Instantiate(projectile, muzzle.position, muzzle.rotation);
     aProjectile.SetSpeed(muzzleVelocity);
 
     Instantiate(shell, ejector.position, ejector.rotation);
-    muzzleFlash.Activate();
+    muzzleFlash.Animate();
   }
 }

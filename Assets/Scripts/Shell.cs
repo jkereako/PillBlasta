@@ -9,11 +9,10 @@ public class Shell: MonoBehaviour {
   public float lifetime = 4.0f;
   public float animationDuration = 2.0f;
 
-  Rigidbody rigidBody;
-
   void Start() {
     float force = Random.Range(minForce, maxForce);
-    rigidBody = GetComponent<Rigidbody>();
+    Rigidbody rigidBody = GetComponent<Rigidbody>();
+
     rigidBody.AddForce(transform.right * force);
     rigidBody.AddTorque(Random.insideUnitSphere * force);
 
@@ -21,8 +20,6 @@ public class Shell: MonoBehaviour {
   }
 
   IEnumerator Fade() {
-    yield return new WaitForSeconds(lifetime);
-
     float percentCompleted = 0.0f;
     float animationSpeed = 1.0f / animationDuration;
     Material material = GetComponent<Renderer>().material;
