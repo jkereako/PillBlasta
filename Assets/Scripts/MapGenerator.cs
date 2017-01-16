@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System;
 
-[RequireComponent(typeof(BoxCollider))]
 public class MapGenerator: MonoBehaviour {
   public Map[] maps;
   public int mapIndex = 0;
   public Transform tilePrefab;
   public Transform obstaclePrefab;
   public Transform navMeshFloor;
+  public Transform mapFloor;
   public Transform navMeshMaskPrefab;
 
   Transform[,] tiles;
@@ -68,11 +68,10 @@ public class MapGenerator: MonoBehaviour {
 
     CreateMapMask(map, navMeshMaskPrefab, containerObject);
 
-    GetComponent<BoxCollider>().size = new Vector3(
-      map.size.x * map.tileSize, 0.5f, map.size.y * map.tileSize
-    );
-
     navMeshFloor.localScale = new Vector3(map.maxSize.x, map.maxSize.y) * map.tileSize;
+    mapFloor.localScale = new Vector3(
+      map.size.x * map.tileSize, map.size.y * map.tileSize
+    );
   }
 
   Coordinate[] CreateTileCoordinates(Map map) {
