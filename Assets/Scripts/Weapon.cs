@@ -26,7 +26,7 @@ public class Weapon: MonoBehaviour {
     Initialize();
   }
 
-  public void OnTriggerHold() {
+  public void OnTriggerPull() {
     if (shotsRemaining == 0 || Time.time < nextShotTime) {
       return;
     }

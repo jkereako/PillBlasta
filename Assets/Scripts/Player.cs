@@ -4,23 +4,26 @@
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(WeaponController))]
 public class Player: LiveEntity {
-  public float speed = 5;
+  public EntityTrait trait;
 
   PlayerController playerController;
   WeaponController weaponController;
   Camera mainCamera;
 
-  protected override void Start() {
-    base.Start();
+  void Awake() {
     playerController = GetComponent<PlayerController>();
     weaponController = GetComponent<WeaponController>();
     mainCamera = Camera.main;
+
+    // Set entity traits
+    GetComponent<Renderer>().material.color = trait.color;
+    health = trait.health;
   }
 
   void Update() {
     // `GetAxisRaw` returns the unmolested input value. We use it here to make the pill stop on a dime.
     Vector3 movement = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-    Vector3 velocity = movement.normalized * speed;
+    Vector3 velocity = movement.normalized * trait.locomotiveSpeed;
     playerController.Move(velocity);
 
     // The code below allows the player's "eyes" to follow the mouse movement.
@@ -32,12 +35,12 @@ public class Player: LiveEntity {
 
     if (plane.Raycast(ray, out rayLength)) {
       Vector3 point = ray.GetPoint(rayLength);
-      Debug.DrawLine(ray.origin, point, Color.red);
+//      Debug.DrawLine(ray.origin, point, Color.red);
       playerController.LookAt(point);
     }
 
     if (Input.GetMouseButton(0)) {
-      weaponController.OnTriggerHold();
+      weaponController.OnTriggerPull();
     }
     else if (Input.GetMouseButtonUp(0)) {
       weaponController.OnTriggerRelease();

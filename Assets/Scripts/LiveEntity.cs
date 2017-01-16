@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 public class LiveEntity: MonoBehaviour, IDamageable {
-  public float initialHealth;
   protected float health;
   protected bool isAlive;
 
@@ -10,7 +9,6 @@ public class LiveEntity: MonoBehaviour, IDamageable {
 
   protected virtual void Start() {
     isAlive = true;
-    health = initialHealth;
   }
 
   public virtual void TakeHit(float damage, RaycastHit hit) {

@@ -14,9 +14,9 @@ public class WeaponController: MonoBehaviour {
     }
   }
 
-  public void OnTriggerHold() {
+  public void OnTriggerPull() {
     if (weapon != null) {
-      weapon.OnTriggerHold();
+      weapon.OnTriggerPull();
     }
   }
 
