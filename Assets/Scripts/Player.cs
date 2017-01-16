@@ -37,7 +37,10 @@ public class Player: LiveEntity {
     }
 
     if (Input.GetMouseButton(0)) {
-      weaponController.FireWeapon();
+      weaponController.OnTriggerHold();
+    }
+    else if (Input.GetMouseButtonUp(0)) {
+      weaponController.OnTriggerRelease();
     }
   }
 }

@@ -14,9 +14,15 @@ public class WeaponController: MonoBehaviour {
     }
   }
 
-  public void FireWeapon() {
+  public void OnTriggerHold() {
     if (weapon != null) {
-      weapon.Fire();
+      weapon.OnTriggerHold();
+    }
+  }
+
+  public void OnTriggerRelease() {
+    if (weapon != null) {
+      weapon.OnTriggerRelease();
     }
   }
 
