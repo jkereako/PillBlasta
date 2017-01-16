@@ -10,15 +10,19 @@ public class Spawner: MonoBehaviour {
 
   LiveEntity playerEntity;
   Transform player;
-
-  Wave currentWave;
-  int waveIndex = 0;
-  int spawnCount;
-  int activeCount;
-  float nextSpawnTime;
-  bool isActive = true;
   MapGenerator mapGenerator;
   PlayerCampManager playerCampManager;
+  int waveIndex;
+  /// <summary>
+  /// The number of spawned entities. The limit is the int `entityCount` in the struct Wave.
+  /// </summary>
+  int spawnedEntitiesCount;
+  /// <summary>
+  /// The number of surviving enemies. A new wave will spawn once this number reaches 0.
+  /// </summary>
+  int activeEntitiesCount;
+  float nextSpawnTime;
+  bool shouldStopSpawning;
 
   void Start() {
     playerEntity = FindObjectOfType<Player>();
@@ -28,18 +32,20 @@ public class Spawner: MonoBehaviour {
 
     playerEntity.OnDeath += OnPlayerDeath;
 
-    NextWave();
+    // Load the first wave at index 0.
+    LoadNewWave(0);
   }
 
   void Update() {
-    if (!isActive || spawnCount <= 0 || Time.time < nextSpawnTime) {
+    if (shouldStopSpawning || spawnedEntitiesCount >= waves[waveIndex].entityCount ||
+        Time.time < nextSpawnTime) {
       return;
     }
 
-    spawnCount -= 1;
-    nextSpawnTime = Time.time + currentWave.waitValue;
-
     Spawn();
+
+    activeEntitiesCount = spawnedEntitiesCount += 1;
+    nextSpawnTime = Time.time + waves[waveIndex].delay;
   }
 
   void Spawn() {
@@ -91,25 +97,25 @@ public class Spawner: MonoBehaviour {
   }
 
   void OnEnemyDeath() {
-    activeCount -= 1;
+    activeEntitiesCount -= 1;
 
-    if (activeCount == 0 && waveIndex < waves.Length) {
-      NextWave();
+    // If all of the enemies have been killed and the wave index is not out of range, then load the
+    // next wave.
+    if (activeEntitiesCount == 0 && waveIndex < waves.Length - 1) {
+      waveIndex += 1;
+      LoadNewWave(waveIndex);
     }
   }
 
   void OnPlayerDeath() {
-    isActive = false;
+    shouldStopSpawning = true;
   }
 
-  void NextWave() {
-    currentWave = waves[waveIndex];
-    activeCount = spawnCount = currentWave.entityCount;
+  void LoadNewWave(int aWaveIndex) {
+    activeEntitiesCount = spawnedEntitiesCount = 0;
 
     if (OnNewWave != null) {
-      OnNewWave(currentWave, waveIndex);
+      OnNewWave(waves[aWaveIndex], aWaveIndex);
     }
-
-    waveIndex += 1;
   }
 }
