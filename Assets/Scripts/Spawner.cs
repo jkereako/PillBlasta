@@ -42,13 +42,16 @@ public class Spawner: MonoBehaviour {
       return;
     }
 
-    Spawn();
+    Enemy spawn = Spawn();
+
+    // Set the entity's traits
+    spawn.SetTrait(waves[waveIndex].entityTrait);
 
     activeEntitiesCount = spawnedEntitiesCount += 1;
     nextSpawnTime = Time.time + waves[waveIndex].delay;
   }
 
-  void Spawn() {
+  Enemy Spawn() {
     Transform tile;
     Enemy spawn;
     tile = FindSpawnableTile(mapGenerator.GetActiveMap(), player.position, playerCampManager);
@@ -58,6 +61,8 @@ public class Spawner: MonoBehaviour {
     spawn = Instantiate(enemy, tile.position + Vector3.up, Quaternion.identity);
     // Assign the delegate `OnEnemyDeath`
     spawn.OnDeath += OnEnemyDeath;
+
+    return spawn;
   }
 
   Transform FindSpawnableTile(Map map, Vector3 playerPosition, PlayerCampManager aPlayerCampManager) {

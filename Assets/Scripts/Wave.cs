@@ -1,5 +1,8 @@
-﻿[System.Serializable]
+﻿using UnityEngine;
+
+[System.Serializable]
 public struct Wave {
-  public int entityCount;
   public float delay;
+  public int entityCount;
+  public EntityTrait entityTrait;
 }

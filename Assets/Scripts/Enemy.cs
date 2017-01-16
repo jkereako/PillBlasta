@@ -15,38 +15,40 @@ public class Enemy: LiveEntity {
 
   State state;
   NavMeshAgent pathFinder;
-  Material material;
-  Color originalColor;
   Transform target;
   LiveEntity targetEntity;
   const float attackDistanceThreshold = 0.5f;
   const float attackWaitValue = 1.0f;
-  const float attackDamage = 1.0f;
+  float attackDamage = 1.0f;
   float nextAttackTime;
   float collisionRadius;
   float targetCollisionRadius;
   bool hasTarget;
 
-  protected override void Start() {
-    base.Start();
-
+  void Awake() {
     if (GameObject.FindGameObjectWithTag("Player") == null) {
       hasTarget = false;
       return;
     }
-
-    hasTarget = true;
-    nextAttackTime = Time.time;
-    state = State.Chasing;
+      
     target = GameObject.FindGameObjectWithTag("Player").transform;
     pathFinder = GetComponent<NavMeshAgent>();
-    material = GetComponent<Renderer>().material;
     targetEntity = target.GetComponent<LiveEntity>();
-    targetEntity.OnDeath += OnTargetDeath;
-    originalColor = material.color;
     collisionRadius = GetComponent<CapsuleCollider>().radius;
     targetCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
-    StartCoroutine(UpdatePath());
+    hasTarget = true;
+    nextAttackTime = Time.time;
+    state = State.Idle;
+    targetEntity.OnDeath += OnTargetDeath;
+  }
+
+  protected override void Start() {
+    base.Start();
+
+    if (hasTarget) {
+      state = State.Chasing;
+      StartCoroutine(UpdatePath());
+    }
   }
 
   public override void TakeHit(float damage, RaycastHit hit) {
@@ -78,12 +80,22 @@ public class Enemy: LiveEntity {
     }
   }
 
+  public void SetTrait(EntityTrait trait) {
+    Material material = GetComponent<Renderer>().material;
+    material.color = trait.color;
+    pathFinder.speed = trait.locomotiveSpeed;
+    health = trait.health;
+    attackDamage = trait.attackDamage;
+  }
+
   void OnTargetDeath() {
     hasTarget = false;
     state = State.Idle;
   }
 
   IEnumerator Attack() {
+    Material material = GetComponent<Renderer>().material;
+    Color originalColor = material.color;
     state = State.Attacking;
     pathFinder.enabled = false;
 
@@ -91,7 +103,7 @@ public class Enemy: LiveEntity {
     Vector3 directionToTarget = (target.position - transform.position).normalized;
     Vector3 attackPosition = target.position - directionToTarget * collisionRadius;
     
-    float attackSpeed = 3.0f;
+    const float attackSpeed = 3.0f;
     float percentCompleted = 0.0f;
     material.color = Color.red;
     bool hasAppliedDamage = false;
@@ -118,7 +130,7 @@ public class Enemy: LiveEntity {
   }
 
   IEnumerator UpdatePath() {
-    const float refreshRate = 0.25f;
+    const float delay = 0.25f;
 
     while (hasTarget) {
       if (state == State.Chasing) {
@@ -131,7 +143,7 @@ public class Enemy: LiveEntity {
         } 
       }
 
-      yield return new WaitForSeconds(refreshRate);
+      yield return new WaitForSeconds(delay);
     }
   }
 }
