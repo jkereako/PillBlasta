@@ -13,7 +13,7 @@ public class Enemy: LiveEntity {
 
   public ParticleSystem deathEffect;
 
-  State state;
+  State state = State.Idle;
   NavMeshAgent pathFinder;
   Transform target;
   LiveEntity targetEntity;
@@ -38,7 +38,6 @@ public class Enemy: LiveEntity {
     targetCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
     hasTarget = true;
     nextAttackTime = Time.time;
-    state = State.Idle;
     targetEntity.OnDeath += OnTargetDeath;
   }
 
@@ -81,8 +80,7 @@ public class Enemy: LiveEntity {
   }
 
   public void SetTrait(EntityTrait trait) {
-    Material material = GetComponent<Renderer>().material;
-    material.color = trait.color;
+    GetComponent<Renderer>().material.color = trait.color;
     pathFinder.speed = trait.locomotiveSpeed;
     health = trait.health;
     attackDamage = trait.attackDamage;
