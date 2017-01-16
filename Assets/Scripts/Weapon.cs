@@ -22,7 +22,7 @@ public class Weapon: MonoBehaviour {
   float nextShotTime;
   int shotsRemaining;
 
-  public void Start() {
+  void Start() {
     Initialize();
   }
 
