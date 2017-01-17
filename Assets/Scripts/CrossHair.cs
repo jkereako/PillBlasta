@@ -1,0 +1,29 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CrossHair : MonoBehaviour {
+
+  public LayerMask targetMask;
+  public SpriteRenderer dot;
+  public Color color;
+  public Color highlightColor;
+
+  void Start() {
+    Cursor.visible = false;
+    dot.color = color;
+  }
+
+  void Update() {
+    transform.Rotate(Vector3.forward * 40 * Time.deltaTime);
+  }
+
+  public void DetectTargets(Ray ray) {
+    if (Physics.Raycast(ray, 100, targetMask)) {
+      dot.color = highlightColor;
+    }
+    else {
+      dot.color = color;
+    }
+  }
+}

@@ -5,7 +5,7 @@
 [RequireComponent(typeof(WeaponController))]
 public class Player: LiveEntity {
   public EntityTrait trait;
-
+  public CrossHair crossHair;
   PlayerController playerController;
   WeaponController weaponController;
   Camera mainCamera;
@@ -30,13 +30,15 @@ public class Player: LiveEntity {
     Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
     // Emulate the playing surface by creating a new, flat plane. This simplifies the code as we
     // don't have to depend on the actual in-game plane.
-    Plane plane = new Plane(Vector3.up, Vector3.zero);
+    Plane plane = new Plane(Vector3.up, Vector3.up * weaponController.weaponHold.position.y);
     float rayLength;
 
     if (plane.Raycast(ray, out rayLength)) {
       Vector3 point = ray.GetPoint(rayLength);
 //      Debug.DrawLine(ray.origin, point, Color.red);
       playerController.LookAt(point);
+      crossHair.transform.position = point;
+      crossHair.DetectTargets(ray);
     }
 
     if (Input.GetMouseButton(0)) {
