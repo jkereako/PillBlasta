@@ -11,7 +11,7 @@ public class LiveEntity: MonoBehaviour, IDamageable {
     isAlive = true;
   }
 
-  public virtual void TakeHit(float damage, RaycastHit hit) {
+  public virtual void TakeHit(float damage, Vector3 hitPoint, Vector3 direction) {
     TakeDamage(damage);
   }
 

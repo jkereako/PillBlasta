@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Runtime.Remoting.Contexts;
 
 public class Projectile: MonoBehaviour {
   public LayerMask collisionMask;
@@ -32,8 +31,15 @@ public class Projectile: MonoBehaviour {
   void CheckCollision(float distance) {
     Ray ray = new Ray(transform.position, transform.forward);
     RaycastHit hit;
-
-    if (Physics.Raycast(ray, out hit, distance + targetSurfaceThickness, collisionMask, QueryTriggerInteraction.Collide)) {
+    bool result = Physics.Raycast(
+                    ray, 
+                    out hit,
+                    distance + targetSurfaceThickness,
+                    collisionMask, 
+                    QueryTriggerInteraction.Collide
+                  );
+      
+    if (result) {
       OnObjectHit(hit);
     }
   }
@@ -42,7 +48,7 @@ public class Projectile: MonoBehaviour {
     IDamageable damageable = hit.collider.GetComponent<IDamageable>();
 
     if (damageable != null) {
-      damageable.TakeHit(damage, hit);
+      damageable.TakeHit(damage, hit.point, transform.forward);
     }
 
     Destroy(gameObject);
@@ -52,7 +58,7 @@ public class Projectile: MonoBehaviour {
     IDamageable damageable = aCollider.GetComponent<IDamageable>();
 
     if (damageable != null) {
-      damageable.TakeDamage(damage);
+      damageable.TakeHit(damage, transform.position, transform.forward);
     }
 
     Destroy(gameObject);

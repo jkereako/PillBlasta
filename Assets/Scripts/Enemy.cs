@@ -50,20 +50,20 @@ public class Enemy: LiveEntity {
     }
   }
 
-  public override void TakeHit(float damage, RaycastHit hit) {
+  public override void TakeHit(float damage, Vector3 hitPoint, Vector3 direction) {
     if (damage >= health) {
       GameObject particles;
 
       particles = Instantiate(
         deathEffect.gameObject,
-        hit.point, 
-        Quaternion.FromToRotation(hit.point, Vector3.forward)
+        hitPoint, 
+        Quaternion.FromToRotation(Vector3.forward, direction)
       );
 
       Destroy(particles, 2);
     }
 
-    base.TakeHit(damage, hit);
+    base.TakeHit(damage, hitPoint, direction);
   }
 
   void Update() {
