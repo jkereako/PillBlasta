@@ -37,6 +37,7 @@ public class Player: LiveEntity {
       Vector3 point = ray.GetPoint(rayLength);
 //      Debug.DrawLine(ray.origin, point, Color.red);
       playerController.LookAt(point);
+      weaponController.Aim(point);
       crossHair.transform.position = point;
       crossHair.DetectTargets(ray);
     }

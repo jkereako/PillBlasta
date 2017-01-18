@@ -14,6 +14,12 @@ public class WeaponController: MonoBehaviour {
     }
   }
 
+  public void Aim(Vector3 point) {
+    if (weapon != null) {
+      weapon.Aim(point);
+    }
+  }
+
   public void OnTriggerPull() {
     if (weapon != null) {
       weapon.OnTriggerPull();

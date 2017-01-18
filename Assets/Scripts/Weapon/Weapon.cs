@@ -45,6 +45,10 @@ public class Weapon: MonoBehaviour {
     Initialize();
   }
 
+  public void Aim(Vector3 point) {
+    transform.LookAt(point);
+  }
+
   void Fire() {
     Projectile aProjectile;
     MuzzleFlash muzzleFlash = GetComponent<MuzzleFlash>();

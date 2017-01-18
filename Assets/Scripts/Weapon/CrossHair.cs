@@ -5,6 +5,7 @@ using UnityEngine;
 public class CrossHair : MonoBehaviour {
 
   public LayerMask targetMask;
+  public SpriteRenderer crossHairs;
   public SpriteRenderer dot;
   public Color color;
   public Color highlightColor;
@@ -12,9 +13,11 @@ public class CrossHair : MonoBehaviour {
   void Start() {
     Cursor.visible = false;
     dot.color = color;
+    crossHairs.color = color;
   }
 
   void Update() {
+    // Rotate the crosshairs
     transform.Rotate(Vector3.forward * 40 * Time.deltaTime);
   }
 
