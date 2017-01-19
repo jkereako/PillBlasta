@@ -30,6 +30,8 @@ public class Player: LiveEntity {
     Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
     // Emulate the playing surface by creating a new, flat plane. This simplifies the code as we
     // don't have to depend on the actual in-game plane.
+    //
+    // `Vector3.up` Shorthand for writing `Vector3(0, 1, 0)`.
     Plane plane = new Plane(Vector3.up, Vector3.up * weaponController.weaponHold.position.y);
     float rayLength;
 
