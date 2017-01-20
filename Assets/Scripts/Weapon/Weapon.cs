@@ -21,17 +21,24 @@ public class Weapon: MonoBehaviour {
 
   float nextShotTime;
   int shotsRemaining;
-  Vector3 velocity;
+  float angleDampaningVelocity;
+  Vector3 postitionDampaningVelocity;
+  float recoilAngle;
 
   void Start() {
     Initialize();
   }
 
-  void Update() {
+  void LateUpdate() {
     // Reset the position of the weapon.
-    Vector3 smoothDamp;
-    smoothDamp = Vector3.SmoothDamp(transform.localPosition, Vector3.zero, ref velocity, 0.1f);
-    transform.localPosition = smoothDamp;
+    Vector3 postitionDampaning;
+    postitionDampaning = Vector3.SmoothDamp(
+      transform.localPosition, Vector3.zero, ref postitionDampaningVelocity, 0.1f
+    );
+    recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref angleDampaningVelocity, 0.1f);
+
+    transform.localPosition = postitionDampaning;
+    transform.localEulerAngles += Vector3.left * recoilAngle;   
   }
 
   public void OnTriggerPull() {
@@ -71,6 +78,8 @@ public class Weapon: MonoBehaviour {
   }
 
   void AnimateRecoil() {
+    recoilAngle += 8.0f;
+    Mathf.Clamp(recoilAngle, 0, 30);
     // Move the weapon backward
     transform.localPosition -= Vector3.forward * 0.2f;
   }
