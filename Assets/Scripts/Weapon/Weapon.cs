@@ -21,9 +21,17 @@ public class Weapon: MonoBehaviour {
 
   float nextShotTime;
   int shotsRemaining;
+  Vector3 velocity;
 
   void Start() {
     Initialize();
+  }
+
+  void Update() {
+    // Reset the position of the weapon.
+    Vector3 smoothDamp;
+    smoothDamp = Vector3.SmoothDamp(transform.localPosition, Vector3.zero, ref velocity, 0.1f);
+    transform.localPosition = smoothDamp;
   }
 
   public void OnTriggerPull() {
@@ -58,6 +66,13 @@ public class Weapon: MonoBehaviour {
 
     Instantiate(shell, ejector.position, ejector.rotation);
     muzzleFlash.Animate();
+
+    AnimateRecoil();
+  }
+
+  void AnimateRecoil() {
+    // Move the weapon backward
+    transform.localPosition -= Vector3.forward * 0.2f;
   }
 
   void Initialize() {
