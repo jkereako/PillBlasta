@@ -9,15 +9,17 @@ public enum FireMode {
 
 [RequireComponent(typeof(MuzzleFlash))]
 public class Weapon: MonoBehaviour {
+  [Header("Weapon attributes")]
   public FireMode fireMode;
+  public int burstCount = 3;
+  public float fireRate = 100;
+  public float muzzleVelocity = 35;
+
+  [Header("Referenced objects")]
   public Transform muzzle;
   public Transform ejector;
   public Projectile projectile;
   public Transform shell;
-
-  public int burstCount = 3;
-  public float fireRate = 100;
-  public float muzzleVelocity = 35;
 
   float nextShotTime;
   int shotsRemaining;
