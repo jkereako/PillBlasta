@@ -13,6 +13,7 @@ public class Weapon: MonoBehaviour {
   public FireMode fireMode;
   public int burstCount = 3;
   public float fireRate = 100;
+  public int magazineSize = 12;
   public float muzzleVelocity = 35;
 
   [Header("Referenced objects")]
@@ -22,7 +23,8 @@ public class Weapon: MonoBehaviour {
   public Transform shell;
 
   float nextShotTime;
-  int shotsRemaining;
+  int shotsLeftInBurst;
+  int shotsLeftInMagazine;
   float angleDampaningVelocity;
   Vector3 postitionDampaningVelocity;
   float recoilAngle;
@@ -44,7 +46,9 @@ public class Weapon: MonoBehaviour {
   }
 
   public void OnTriggerPull() {
-    if (shotsRemaining == 0 || Time.time < nextShotTime) {
+    // Multiplying `shotsLeftInMagazine` by `shotsLeftInBurst` is a concise way to determine if
+    // either value is 0.
+    if (shotsLeftInMagazine * shotsLeftInBurst == 0 || Time.time < nextShotTime) {
       return;
     }
 
@@ -53,7 +57,7 @@ public class Weapon: MonoBehaviour {
     switch (fireMode) {
     case FireMode.Single:
     case FireMode.Burst:
-      shotsRemaining -= 1;
+      shotsLeftInMagazine = shotsLeftInBurst -= 1;
       break;
     }
   }
@@ -87,15 +91,19 @@ public class Weapon: MonoBehaviour {
   }
 
   void Initialize() {
+    shotsLeftInMagazine = magazineSize;
+
     switch (fireMode) {
     case FireMode.Single:
-      shotsRemaining = 1;
+      shotsLeftInBurst = 1;
       break;
+    
     case FireMode.Burst:
-      shotsRemaining = burstCount;
+      shotsLeftInBurst = burstCount;
       break;
+
     case FireMode.Automatic:
-      shotsRemaining = -1;
+      shotsLeftInBurst = -1;
       break;
     }
   }
