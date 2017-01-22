@@ -20,6 +20,12 @@ public class WeaponController: MonoBehaviour {
     }
   }
 
+  public void Reload() {
+    if (weapon != null) {
+      weapon.Reload();
+    }
+  }
+
   public void OnTriggerPull() {
     if (weapon != null) {
       weapon.OnTriggerPull();

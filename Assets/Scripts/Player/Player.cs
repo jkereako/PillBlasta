@@ -53,6 +53,11 @@ public class Player: LiveEntity {
     crossHair.transform.position = point;
     crossHair.DetectTargets(ray);
 
+    ScanInput();
+    Move();
+  }
+
+  void ScanInput() {
     if (Input.GetMouseButton(0)) {
       weaponController.OnTriggerPull();
     }
@@ -60,7 +65,9 @@ public class Player: LiveEntity {
       weaponController.OnTriggerRelease();
     }
 
-    Move();
+    if (Input.GetKeyDown(KeyCode.R)) {
+      weaponController.Reload();
+    }
   }
 
   void Move() {

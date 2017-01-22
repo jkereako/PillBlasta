@@ -80,6 +80,10 @@ public class Weapon: MonoBehaviour {
     transform.LookAt(point);
   }
 
+  public void Reload() {
+    StartCoroutine(AnimateReload());
+  }
+
   void Fire() {
     Projectile aProjectile;
     MuzzleFlash muzzleFlash = GetComponent<MuzzleFlash>();
@@ -91,10 +95,6 @@ public class Weapon: MonoBehaviour {
     muzzleFlash.Animate();
 
     AnimateRecoil();
-  }
-
-  void Reload() {
-    StartCoroutine(AnimateReload());
   }
 
   void AnimateRecoil() {
