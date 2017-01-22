@@ -3,9 +3,9 @@ using System.Runtime.Remoting;
 using System.Collections;
 
 public enum FireMode {
-  Automatic,
-  Burst,
-  Single}
+  SemiAutomatic,
+  ThreeRoundBurst,
+  FullyAutomatic}
 
 ;
 
@@ -13,7 +13,6 @@ public enum FireMode {
 public class Weapon: MonoBehaviour {
   [Header("Weapon attributes")]
   public FireMode fireMode;
-  public int burstCount = 3;
   public float fireRate = 100;
   public int magazineSize = 12;
   public float muzzleVelocity = 35;
@@ -66,8 +65,8 @@ public class Weapon: MonoBehaviour {
     shotsLeftInMagazine -= 1;
 
     switch (fireMode) {
-    case FireMode.Single:
-    case FireMode.Burst:
+    case FireMode.SemiAutomatic:
+    case FireMode.ThreeRoundBurst:
       shotsLeftInBurst -= 1;
       break;
     }
@@ -106,13 +105,14 @@ public class Weapon: MonoBehaviour {
   }
 
   IEnumerator AnimateReload() {
-    isReloading = true;
-    yield return new WaitForSeconds(0.3f);
-
     const float reloadTime = 0.5f;
     const float speed = 1.0f / reloadTime;
     float percentCompleted = 0.0f;
     Vector3 initialRoration = transform.localEulerAngles;
+
+    isReloading = true;
+
+    yield return new WaitForSeconds(0.2f);
 
     while (percentCompleted <= 1.0f) {
       percentCompleted += Time.deltaTime * speed;
@@ -129,15 +129,15 @@ public class Weapon: MonoBehaviour {
 
   void Initialize() {
     switch (fireMode) {
-    case FireMode.Single:
+    case FireMode.SemiAutomatic:
       shotsLeftInBurst = 1;
       break;
     
-    case FireMode.Burst:
-      shotsLeftInBurst = burstCount;
+    case FireMode.ThreeRoundBurst:
+      shotsLeftInBurst = 3;
       break;
 
-    case FireMode.Automatic:
+    case FireMode.FullyAutomatic:
       shotsLeftInBurst = -1;
       break;
     }
