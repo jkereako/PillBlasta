@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Runtime.Remoting;
+using System.Collections;
 
 public enum FireMode {
   Automatic,
@@ -25,11 +27,14 @@ public class Weapon: MonoBehaviour {
   float nextShotTime;
   int shotsLeftInBurst;
   int shotsLeftInMagazine;
+  bool isReloading;
   float angleDampaningVelocity;
   Vector3 postitionDampaningVelocity;
   float recoilAngle;
 
   void Start() {
+    shotsLeftInMagazine = magazineSize;
+
     Initialize();
   }
 
@@ -42,22 +47,28 @@ public class Weapon: MonoBehaviour {
     recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref angleDampaningVelocity, 0.1f);
 
     transform.localPosition = postitionDampaning;
-    transform.localEulerAngles += Vector3.left * recoilAngle;   
+    transform.localEulerAngles += Vector3.left * recoilAngle;
+
+    if (!isReloading && shotsLeftInMagazine == 0) {
+      Reload();
+    }
   }
 
   public void OnTriggerPull() {
     // Multiplying `shotsLeftInMagazine` by `shotsLeftInBurst` is a concise way to determine if
     // either value is 0.
-    if (shotsLeftInMagazine * shotsLeftInBurst == 0 || Time.time < nextShotTime) {
+    if (isReloading || shotsLeftInMagazine * shotsLeftInBurst == 0 || Time.time < nextShotTime) {
       return;
     }
 
     Fire();
 
+    shotsLeftInMagazine -= 1;
+
     switch (fireMode) {
     case FireMode.Single:
     case FireMode.Burst:
-      shotsLeftInMagazine = shotsLeftInBurst -= 1;
+      shotsLeftInBurst -= 1;
       break;
     }
   }
@@ -83,6 +94,10 @@ public class Weapon: MonoBehaviour {
     AnimateRecoil();
   }
 
+  void Reload() {
+    StartCoroutine(AnimateReload());
+  }
+
   void AnimateRecoil() {
     recoilAngle += 8.0f;
     Mathf.Clamp(recoilAngle, 0, 30);
@@ -90,9 +105,29 @@ public class Weapon: MonoBehaviour {
     transform.localPosition -= Vector3.forward * 0.2f;
   }
 
-  void Initialize() {
-    shotsLeftInMagazine = magazineSize;
+  IEnumerator AnimateReload() {
+    isReloading = true;
+    yield return new WaitForSeconds(0.3f);
 
+    const float reloadTime = 0.5f;
+    const float speed = 1.0f / reloadTime;
+    float percentCompleted = 0.0f;
+    Vector3 initialRoration = transform.localEulerAngles;
+
+    while (percentCompleted <= 1.0f) {
+      percentCompleted += Time.deltaTime * speed;
+      float interpolation = (-Mathf.Pow(percentCompleted, 2) + percentCompleted) * 4;
+      float angle = Mathf.Lerp(0, 30.0f, interpolation);
+      transform.localEulerAngles = initialRoration + Vector3.left * angle;
+
+      yield return null;
+    }
+
+    shotsLeftInMagazine = magazineSize;
+    isReloading = false;
+  }
+
+  void Initialize() {
     switch (fireMode) {
     case FireMode.Single:
       shotsLeftInBurst = 1;
