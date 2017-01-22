@@ -10,7 +10,15 @@ public class Player: LiveEntity {
   WeaponController weaponController;
   Camera mainCamera;
 
+  public void OnNewWave(Wave wave, int waveIndex) {
+    health = 10;
+    int index = Random.Range(0, weaponController.weapons.Length - 1);
+
+    weaponController.EquipWeapon(weaponController.weapons[index]);
+  }
+
   void Awake() {
+    FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
     playerController = GetComponent<PlayerController>();
     weaponController = GetComponent<WeaponController>();
     mainCamera = Camera.main;

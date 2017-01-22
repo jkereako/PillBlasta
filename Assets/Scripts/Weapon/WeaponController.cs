@@ -2,51 +2,43 @@
 using System.Reflection;
 
 public class WeaponController: MonoBehaviour {
-
   public Transform weaponHold;
-  public Weapon initialWeapon;
-
-  Weapon weapon;
-
-  void Start() {
-    if (initialWeapon != null) {
-      EquipWeapon(initialWeapon);
-    }
-  }
+  public Weapon[] weapons;
+  Weapon equippedWeapon;
 
   public void Aim(Vector3 point) {
-    if (weapon != null) {
-      weapon.Aim(point);
+    if (equippedWeapon != null) {
+      equippedWeapon.Aim(point);
     }
   }
 
   public void Reload() {
-    if (weapon != null) {
-      weapon.Reload();
+    if (equippedWeapon != null) {
+      equippedWeapon.Reload();
     }
   }
 
   public void OnTriggerPull() {
-    if (weapon != null) {
-      weapon.OnTriggerPull();
+    if (equippedWeapon != null) {
+      equippedWeapon.OnTriggerPull();
     }
   }
 
   public void OnTriggerRelease() {
-    if (weapon != null) {
-      weapon.OnTriggerRelease();
+    if (equippedWeapon != null) {
+      equippedWeapon.OnTriggerRelease();
     }
   }
 
   public void EquipWeapon(Weapon aWeapon) {
-    if (weapon != null) {
+    if (equippedWeapon != null) {
       // Mark the current weapon for destruction
-      Destroy(weapon);
+      Destroy(equippedWeapon);
     }
 
-    weapon = Instantiate(aWeapon, weaponHold.position, weaponHold.rotation) as Weapon;
+    equippedWeapon = Instantiate(aWeapon, weaponHold.position, weaponHold.rotation) as Weapon;
     // Bind the weapon as a child of the  to the `weaponHold` game object, which is a child of
     // player, so that when the player moves the gun moves also
-    weapon.transform.parent = weaponHold;
+    equippedWeapon.transform.parent = weaponHold;
   }
 }
