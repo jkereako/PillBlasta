@@ -2,22 +2,55 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Runtime.InteropServices;
 
 public class GameUIController : MonoBehaviour {
   public Image fadePlane;
   public GameObject gameOverUI;
+  public RectTransform banner;
+  public Text title;
+  public Text subtitle;
 
   void Awake() {
     FindObjectOfType<Player>().OnDeath += OnGameOver;
+    FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
   }
 
   public void StartNewGame() {
     SceneManager.LoadScene("Main");
   }
 
+  void OnNewWave(Wave wave, int waveCount) {
+    title.text = "WAVE " + (waveCount + 1);
+    subtitle.text = wave.entityCount + " enemies";
+    StartCoroutine(AnimateBanner(1.5f, 2.0f));
+  }
+
   void OnGameOver() {
     gameOverUI.SetActive(true);
     StartCoroutine(Fade(Color.clear, Color.black, 1.0f));
+  }
+
+  IEnumerator AnimateBanner(float speed, float delay) {
+    int direction = 1;
+    float percentCompleted = 0.0f;
+    float restartExecutionTime = Time.time + 1 / speed + delay;
+
+    while (percentCompleted >= 0) {
+      percentCompleted += Time.deltaTime * speed * direction;
+
+      if (percentCompleted >= 1) {
+        percentCompleted = 1;
+
+        if (Time.time > restartExecutionTime) {
+          direction = -1;
+        }
+      }
+
+      banner.anchoredPosition = Vector2.up * Mathf.Lerp(-420, -200, percentCompleted);
+
+      yield return null;
+    }
   }
 
   IEnumerator Fade(Color fromColor, Color toColor, float duration) {
