@@ -80,7 +80,7 @@ public class Enemy: LiveEntity {
   }
 
   public void SetTrait(EntityTrait trait) {
-    GetComponent<Renderer>().material.color = trait.color;
+    GetComponent<Renderer>().sharedMaterial.color = trait.color;
     pathFinder.speed = trait.locomotiveSpeed;
     health = trait.health;
     attackDamage = trait.attackDamage;
