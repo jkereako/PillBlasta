@@ -1,31 +1,43 @@
 ﻿using UnityEngine;
-using UnityEngine.VR.WSA.WebCam;
 using System.Collections;
-using UnityEditor;
 
 public class AudioManager: MonoBehaviour {
-  float masterVolumePercent;
-  float fxVolumePercent;
-  float musicVolumePercent;
+  public static AudioManager instance;
+
+  const float masterVolumePercent = 0.2f;
+  const float fxVolumePercent = 1.0f;
+  const float musicVolumePercent = 1.0f;
   AudioSource previouslyActiveMusicSource;
   AudioSource activeMusicSource;
   AudioSource[] musicSources;
 
   void Awake() {
-    AudioSource[] musicSources = new AudioSource[2];
+    if (instance == null) {
+      instance = this;
+      DontDestroyOnLoad(this.gameObject);
 
-    for (int i = 0; i < musicSources.Length; i++) {
-      GameObject musicSource = new GameObject("MusicSource" + i);
-      musicSources[i] = musicSource.AddComponent<AudioSource>();
-      musicSource.transform.parent = transform;
+      musicSources = new AudioSource[2];
+
+      for (int i = 0; i < musicSources.Length; i++) {
+        GameObject musicSource = new GameObject("MusicSource" + i);
+        musicSources[i] = musicSource.AddComponent<AudioSource>();
+        musicSource.transform.parent = transform;
+      }
+
+      activeMusicSource = musicSources[0];
+    }
+    else {
+      Debug.Log("Destroy Audio Manager");
+      Destroy(this);
     }
   }
 
-  void PlaySoundEffect(AudioClip clip, Vector3 position) {
+  public void PlaySoundEffect(AudioClip clip, Vector3 position) {
     AudioSource.PlayClipAtPoint(clip, position, fxVolumePercent * masterVolumePercent);
   }
 
-  void PlayMusic(AudioClip clip, float fadeDuration = 1.0f) {
+  public void PlayMusic(AudioClip clip, float fadeDuration = 1.0f) {
+    previouslyActiveMusicSource = activeMusicSource;
     activeMusicSource.clip = clip;
     activeMusicSource.Play();
 
