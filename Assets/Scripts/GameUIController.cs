@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System.Runtime.InteropServices;
 
 public class GameUIController : MonoBehaviour {
   public Image fadePlane;
@@ -32,6 +31,8 @@ public class GameUIController : MonoBehaviour {
   }
 
   IEnumerator AnimateBanner(float speed, float delay) {
+    const int offScreenYPosition = -460;
+    const int onScreenYPosition = -200;
     int direction = 1;
     float percentCompleted = 0.0f;
     float restartExecutionTime = Time.time + 1 / speed + delay;
@@ -47,7 +48,9 @@ public class GameUIController : MonoBehaviour {
         }
       }
 
-      banner.anchoredPosition = Vector2.up * Mathf.Lerp(-420, -200, percentCompleted);
+      banner.anchoredPosition = Vector2.up * Mathf.Lerp(
+        offScreenYPosition, onScreenYPosition, percentCompleted
+      );
 
       yield return null;
     }

@@ -5,6 +5,9 @@ using System.Collections;
 public class AudioManager: MonoBehaviour {
   public static AudioManager instance;
 
+  Transform audioListener;
+  Transform player;
+
   const float masterVolumePercent = 0.2f;
   const float fxVolumePercent = 1.0f;
   const float musicVolumePercent = 1.0f;
@@ -16,6 +19,9 @@ public class AudioManager: MonoBehaviour {
     if (instance == null) {
       instance = this;
       DontDestroyOnLoad(this.gameObject);
+
+      audioListener = FindObjectOfType<AudioListener>().transform;
+      player = FindObjectOfType<Player>().transform;
 
       musicSources = new AudioSource[2];
 
@@ -31,6 +37,14 @@ public class AudioManager: MonoBehaviour {
       Debug.Log("Destroy Audio Manager");
       Destroy(this);
     }
+  }
+
+  void Update() {
+    if (player == null) {
+      return;
+    }
+
+    audioListener.position = player.position;
   }
 
   public void PlaySoundEffect(AudioClip clip, Vector3 position) {
