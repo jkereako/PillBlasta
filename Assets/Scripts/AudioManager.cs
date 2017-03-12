@@ -34,7 +34,6 @@ public class AudioManager: MonoBehaviour {
       activeMusicSource = musicSources[0];
     }
     else {
-      Debug.Log("Destroy Audio Manager");
       Destroy(this);
     }
   }

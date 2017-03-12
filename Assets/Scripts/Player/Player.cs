@@ -10,13 +10,6 @@ public class Player: LiveEntity {
   WeaponController weaponController;
   Camera mainCamera;
 
-  public void OnNewWave(Wave wave, int waveIndex) {
-    health = 10;
-    int index = Random.Range(0, weaponController.weapons.Length - 1);
-
-    weaponController.EquipWeapon(weaponController.weapons[index]);
-  }
-
   void Awake() {
     FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
     playerController = GetComponent<PlayerController>();
@@ -63,6 +56,13 @@ public class Player: LiveEntity {
 
     ScanInput();
     Move();
+  }
+
+  public void OnNewWave(Wave wave, int waveIndex) {
+    health = 10;
+    int index = Random.Range(0, weaponController.weapons.Length - 1);
+
+    weaponController.EquipWeapon(weaponController.weapons[index]);
   }
 
   void ScanInput() {

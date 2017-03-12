@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Reflection;
 
 public class WeaponController: MonoBehaviour {
   public Transform weaponHold;
