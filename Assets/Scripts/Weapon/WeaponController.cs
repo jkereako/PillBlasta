@@ -7,27 +7,19 @@ public class WeaponController: MonoBehaviour {
   Weapon equippedWeapon;
 
   public void Aim(Vector3 point) {
-    if (equippedWeapon != null) {
-      equippedWeapon.Aim(point);
-    }
+    equippedWeapon.Aim(point);
   }
 
   public void Reload() {
-    if (equippedWeapon != null) {
-      equippedWeapon.Reload();
-    }
+    equippedWeapon.Reload();
   }
 
   public void OnTriggerPull() {
-    if (equippedWeapon != null) {
-      equippedWeapon.OnTriggerPull();
-    }
+    equippedWeapon.OnTriggerPull();
   }
 
   public void OnTriggerRelease() {
-    if (equippedWeapon != null) {
-      equippedWeapon.OnTriggerRelease();
-    }
+    equippedWeapon.OnTriggerRelease();
   }
 
   public void EquipWeapon(Weapon aWeapon) {
@@ -36,7 +28,7 @@ public class WeaponController: MonoBehaviour {
       Destroy(equippedWeapon);
     }
 
-    equippedWeapon = Instantiate(aWeapon, weaponHold.position, weaponHold.rotation) as Weapon;
+    equippedWeapon = Instantiate(aWeapon, weaponHold.position, weaponHold.rotation);
     // Bind the weapon as a child of the  to the `weaponHold` game object, which is a child of
     // player, so that when the player moves the gun moves also
     equippedWeapon.transform.parent = weaponHold;
