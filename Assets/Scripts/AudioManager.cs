@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class AudioManager: MonoBehaviour {
@@ -33,10 +34,15 @@ public class AudioManager: MonoBehaviour {
   }
 
   public void PlaySoundEffect(AudioClip clip, Vector3 position) {
+    Assert.IsNotNull(clip);
+ 
     AudioSource.PlayClipAtPoint(clip, position, fxVolumePercent * masterVolumePercent);
   }
 
   public void PlayMusic(AudioClip clip, float fadeDuration = 1.0f) {
+    Assert.IsNotNull(clip);
+    Assert.IsNotNull(activeMusicSource);
+
     previouslyActiveMusicSource = activeMusicSource;
     activeMusicSource.clip = clip;
     activeMusicSource.Play();

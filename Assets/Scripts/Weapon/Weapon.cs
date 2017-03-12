@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Runtime.Remoting;
 using System.Collections;
+using UnityEngine.Audio;
 
 public enum FireMode {
   SemiAutomatic,
@@ -22,6 +23,8 @@ public class Weapon: MonoBehaviour {
   public Transform ejector;
   public Projectile projectile;
   public Transform shell;
+  public AudioClip fireSoundEffect;
+  public AudioClip reloadSoundEffect;
 
   float nextShotTime;
   int shotsLeftInBurst;
@@ -81,6 +84,7 @@ public class Weapon: MonoBehaviour {
   }
 
   public void Reload() {
+    AudioManager.instance.PlaySoundEffect(reloadSoundEffect, transform.position);
     StartCoroutine(AnimateReload());
   }
 
@@ -93,6 +97,7 @@ public class Weapon: MonoBehaviour {
 
     Instantiate(shell, ejector.position, ejector.rotation);
     muzzleFlash.Animate();
+    AudioManager.instance.PlaySoundEffect(fireSoundEffect, transform.position);
 
     AnimateRecoil();
   }
